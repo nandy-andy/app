@@ -4,8 +4,8 @@
  *
  * @author Jakub "Student" Olek
  */
-define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require.optional('popover'), 'track', require.optional('share'), require.optional('wikia.cache'), 'wikia.loader', 'wikia.nirvana', 'wikia.videoBootstrap', 'wikia.media.class'],
-	function(msg, modal, throbber, qs, popover, track, share, cache, loader, nirvana, VideoBootstrap, Media){
+define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require.optional('popover'), 'track', require.optional('share'), require.optional('wikia.cache'), 'wikia.loader', 'wikia.nirvana', 'wikia.videoBootstrap', 'wikia.media.class', 'toast'],
+	function(msg, modal, throbber, qs, popover, track, share, cache, loader, nirvana, VideoBootstrap, Media, toast){
 	'use strict';
 	/** @private **/
 
@@ -90,7 +90,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 				l = data.length;
 
 				while(imageData = data[j++]){
-					name = imageData.name;
+					name = imageData.name && imageData.name.replace( / /g, "_" );
 
 					if (name === shrImg) {shrImg = imagesLength;}
 
@@ -131,7 +131,13 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 		if(shrImg) {
 			setTimeout(function(){
 				!inited && setup();
-				openModal(shrImg);
+				if ( isNaN(shrImg) ) {
+					// file specified in querystring doesn't exist on the page
+					toast.show( msg('wikiamobile-shared-file-not-available') );
+					qs().removeVal('file' ).replaceState();
+				} else {
+					openModal(shrImg);
+				}
 			}, 2000);
 		}
 
@@ -169,7 +175,8 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 	}
 
 	function setupImage(){
-		var video;
+		var video,
+			imgTitle;
 
 		throbber.remove(currentWrapper);
 
@@ -181,7 +188,8 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 		}
 
 		if(currentMedia.type == Media.types.VIDEO) {
-			var imgTitle = currentMedia.name;
+			// just in case we get the title instead of the dbkey, remove spaces
+			imgTitle = currentMedia.name.replace( / /g, "_" );
 
 			zoomable = false;
 
@@ -236,9 +244,14 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 					currentWrapper.innerHTML = html;
 				}
 			}
+			// update url for sharing
+			qs().setVal('file', imgTitle, true ).replaceState();
 		}else if(currentMedia.type == Media.types.IMAGE){
 			var img = new Image();
 			img.src = currentMedia.url;
+
+			// just in case we get the title instead of the dbkey, remove spaces
+			imgTitle = currentMedia.name.replace( / /g, "_" );
 
 			zoomable = true;
 
@@ -271,7 +284,8 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 				origW = img.width;
 				origH = img.height;
 			}
-
+			// update url for sharing
+			qs().setVal('file', imgTitle, true ).replaceState();
 		} else if(currentMedia.type){//custom
 			var data = {
 					currentNum: currentNum,
@@ -286,6 +300,8 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			if(data.zoomable != zoomable){
 				zoomable = data.zoomable
 			}
+			// We're showing an ad or other custom media type.  Don't support sharing.
+			qs().removeVal('file' ).replaceState();
 		}
 
 		// Future video/image views will come from modal
@@ -525,7 +541,6 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 
 		// Video/image view was initiated from article
 		clickSource = "embed";
-
 		currentNum = getMediaNumber(~~num);
 		currentMedia = images[currentNum];
 
@@ -536,6 +551,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			onClose: function(){
 				pager.cleanup();
 				removeZoom();
+				qs().removeVal('file' ).replaceState();
 			},
 			onResize: function(ev){
 				resetZoom();
