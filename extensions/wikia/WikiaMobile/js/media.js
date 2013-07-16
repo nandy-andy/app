@@ -90,7 +90,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 				l = data.length;
 
 				while(imageData = data[j++]){
-					name = imageData.name && imageData.name.replace( / /g, "_" );
+					name = imageData.name;
 
 					if (name === shrImg) {shrImg = imagesLength;}
 
@@ -189,7 +189,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 
 		if(currentMedia.type == Media.types.VIDEO) {
 			// just in case we get the title instead of the dbkey, remove spaces
-			imgTitle = currentMedia.name.replace( / /g, "_" );
+			imgTitle = currentMedia.name;
 
 			zoomable = false;
 
@@ -251,7 +251,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			img.src = currentMedia.url;
 
 			// just in case we get the title instead of the dbkey, remove spaces
-			imgTitle = currentMedia.name.replace( / /g, "_" );
+			imgTitle = currentMedia.name;
 
 			zoomable = true;
 
