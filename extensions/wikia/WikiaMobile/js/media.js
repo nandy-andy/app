@@ -188,7 +188,6 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 		}
 
 		if(currentMedia.type == Media.types.VIDEO) {
-			// just in case we get the title instead of the dbkey, remove spaces
 			imgTitle = currentMedia.name;
 
 			zoomable = false;
@@ -250,7 +249,6 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			var img = new Image();
 			img.src = currentMedia.url;
 
-			// just in case we get the title instead of the dbkey, remove spaces
 			imgTitle = currentMedia.name;
 
 			zoomable = true;
