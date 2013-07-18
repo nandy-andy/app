@@ -52,8 +52,8 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 		startD,
 		galleryInited = false,
 		inited,
-		// Video view click source tracking. Possible values are "embed" and "lightbox" for consistancy with Oasis
-		clickSource,
+		// Video view click source tracking. Default, before lightbox is opened, is "embed".  Other possible values are "share" and "lightbox".
+		clickSource = "embed",
 		videoInstance,
 		events = {},
 		skip = [];
@@ -136,6 +136,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 					toast.show( msg('wikiamobile-shared-file-not-available') );
 					qs().removeVal('file' ).replaceState();
 				} else {
+					clickSource = "share";
 					openModal(shrImg);
 				}
 			}, 2000);
@@ -168,15 +169,17 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 		currentWrapper.className += ' imgPlcHld';
 	}
 
-	function embedVideo(image, data) {
-		videoInstance = new VideoBootstrap(image, data, clickSource);
+	function embedVideo(image, data, cs) {
+		videoInstance = new VideoBootstrap(image, data, cs);
 		// Future video/image views will come from modal
 		clickSource = 'lightbox';
 	}
 
 	function setupImage(){
 		var video,
-			imgTitle;
+			imgTitle,
+			// cache value for clickSource to prevent race conditions
+			cs = clickSource;
 
 		throbber.remove(currentWrapper);
 
@@ -193,7 +196,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			zoomable = false;
 
 			if(videoCache[imgTitle]){
-				embedVideo(currentMedia, videoCache[imgTitle]);
+				embedVideo(currentMedia, videoCache[imgTitle], cs);
 			}else{
 				if(currentMedia.supported) {
 					currentWrapper.innerHTML = '';
@@ -225,7 +228,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 
 								videoCache[imgTitle] = videoData;
 
-								embedVideo(currentWrapper, videoData);
+								embedVideo(currentWrapper, videoData, cs);
 							}
 						}
 					);
@@ -537,8 +540,6 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			galleryData,
 			ttl = 604800; //7days
 
-		// Video/image view was initiated from article
-		clickSource = "embed";
 		currentNum = getMediaNumber(~~num);
 		currentMedia = images[currentNum];
 
@@ -549,7 +550,10 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			onClose: function(){
 				pager.cleanup();
 				removeZoom();
+				// remove file=title from URL
 				qs().removeVal('file' ).replaceState();
+				// reset tracking clickSource
+				clickSource = "embed";
 			},
 			onResize: function(ev){
 				resetZoom();
