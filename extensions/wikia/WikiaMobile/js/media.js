@@ -196,7 +196,7 @@ define('media', ['JSMessages', 'modal', 'throbber', 'wikia.querystring', require
 			zoomable = false;
 
 			if(videoCache[imgTitle]){
-				embedVideo(currentMedia, videoCache[imgTitle], cs);
+				embedVideo(currentWrapper, videoCache[imgTitle], cs);
 			}else{
 				if(currentMedia.supported) {
 					currentWrapper.innerHTML = '';
