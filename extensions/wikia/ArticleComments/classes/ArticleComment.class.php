@@ -577,6 +577,10 @@ class ArticleComment {
 			$props = BlogArticle::getProps( $title->getArticleID() );
 
 			$canComment = isset( $props[ 'commenting' ] ) ? ( bool ) $props[ 'commenting' ] : true;
+		} else {
+			// VOLDEV-2: Check for user rights when commenting on articles
+			global $wgUser;
+			$canComment = $wgUser->isAllowed( 'articlecomment' );
 		}
 
 		return $canComment;

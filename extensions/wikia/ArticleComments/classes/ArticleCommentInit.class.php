@@ -344,7 +344,7 @@ class ArticleCommentInit {
 			$info['error'] = self::ERROR_READONLY;
 			$info['msg'] = wfMsg('readonlytext');
 			$ret = false;
-		} elseif ( !$user->isAllowed( 'edit' ) ) {
+		} elseif ( !$user->isAllowed( 'edit' ) || !$user->isAllowed( 'articlecomment' ) ) {
 			$info['error'] = self::ERROR_USER_CANNOT_EDIT;
 			$info['msg'] = wfMsg( 'article-comments-login', SpecialPage::getTitleFor( 'UserLogin' )->getLocalUrl( ( $title instanceof Title ) ? 'returnto=' . $title->getPrefixedUrl() : null ) );
 			$ret = false;
