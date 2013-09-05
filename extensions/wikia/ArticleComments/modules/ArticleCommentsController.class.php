@@ -17,15 +17,20 @@ class ArticleCommentsController extends WikiaController {
 
 				if ( $sSubmit && $sComment && $iArticleId ) {
 					$oTitle = Title::newFromID( $iArticleId );
+					// VOLDEV-2: Check for user right when commenting on an article
+					$result = array();
+					$canComment = ArticleCommentInit::userCanComment( array(), $oTitle );
 
 					if ( $oTitle instanceof Title ) {
-						$response = ArticleComment::doPost( $this->wg->Request->getVal('wpArticleComment') , $this->wg->User, $oTitle );
+						if ( $canComment ) {
+							$response = ArticleComment::doPost( $this->wg->Request->getVal('wpArticleComment') , $this->wg->User, $oTitle );
+						}
 
 						if ( !$isMobile ) {
 							$this->wg->Out->redirect( $oTitle->getLocalURL() );
 						} else {
-							$result = array();
-							$canComment = ArticleCommentInit::userCanComment( $result, $oTitle );
+						//	$result = array();
+						//	$canComment = ArticleCommentInit::userCanComment( $result, $oTitle );
 
 							//this check should be done for all the skins and before calling ArticleComment::doPost but that requires a good bit of refactoring
 							//and some design review as the OAsis/Monobook template doesn't handle error feedback from this code
