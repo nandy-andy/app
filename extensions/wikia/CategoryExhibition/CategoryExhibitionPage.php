@@ -21,7 +21,7 @@ class CategoryExhibitionPage extends CategoryPageII {
 	}
 }
 
-class CategoryExhibitionViewer extends CategoryPageIIViewer {
+class CategoryExhibitionViewer {
 	var	$title, $limit, $from, $until,
 		$articles, $articles_start_char,
 		$children, $children_start_char,
