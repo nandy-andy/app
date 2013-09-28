@@ -16,17 +16,20 @@ class CategoryPageII extends CategoryPage {
 	public function __construct( Title $title ) {
 		parent::__construct( $title );
 
-		if ( !( $this instanceof CategoryExhibitionPage ) ) {
+		$this->app = F::app();
+		if ( !( $this instanceof CategoryExhibitionPage ) &&
+			$this->app->wg->EnableCategoryTreeExt === true ) {
 			$this->mCategoryViewerClass = 'CategoryTreeCategoryViewer';
 		}
 	}
 	
 	function openShowCategory() {
-		global $wgExtensionsPath, $wgJsMimeType;
+		wfProfileIn( __METHOD__ );
+
 		$output = $this->getContext()->getOutput();
 		$output->addStyle( AssetsManager::getInstance()->getSassCommonURL('extensions/wikia/CategoryExhibition/css/CategoryExhibition.scss'));
 		$output->addStyle( AssetsManager::getInstance()->getSassCommonURL('extensions/wikia/CategoryExhibition/css/CategoryExhibition.IE.scss'), '', 'lte IE 8' );
-		$output->addScript( "<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/wikia/CategoryExhibition/js/CategoryExhibition.js\" ></script>\n" );
+		$output->addScript( "<script type=\"{$this->app->wg->JsMimeType}\" src=\"{$this->app->wg->ExtensionsPath}/wikia/CategoryExhibition/js/CategoryExhibition.js\" ></script>\n" );
 
 		$title = $this->getTitle();
 		$categoryExhibitionSection = new CategoryExhibitionSection( $title );
@@ -42,5 +45,7 @@ class CategoryPageII extends CategoryPage {
 			)
 		);
 		$output->addHTML( $oTmpl->render( "form" ) );
+
+		wfProfileOut( __METHOD__ );
 	}
 }
