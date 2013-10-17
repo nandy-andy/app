@@ -12,11 +12,15 @@ if( !defined( 'MEDIAWIKI' ) )
  */
 class CategoryPageII extends CategoryPage {
 
-	// VOLDEV-16: Load CategoryTree extension if we're in list mode
+	/**
+	 * @param Title $title
+	 */
 	public function __construct( Title $title ) {
 		parent::__construct( $title );
 
 		$this->app = F::app();
+
+		// VOLDEV-16: Load CategoryTree extension if enabled and we're in list mode
 		if ( !( $this instanceof CategoryExhibitionPage ) &&
 			$this->app->wg->EnableCategoryTreeExt === true ) {
 			$this->mCategoryViewerClass = 'CategoryTreeCategoryViewer';
