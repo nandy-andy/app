@@ -6,22 +6,59 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 	protected $langCode;
 	protected $sectionId;
 	protected $verticalId;
+	protected $cityId;
 	protected $skinName;
+	private $shouldFilterCommercialData = false;
+	private $hubsVersion = 2;
 
-	public function __construct($langCode, $sectionId, $verticalId) {
+	public function __construct($langCode, $sectionId, $verticalId, $cityId = 0, $hubsVersion = 2) {
 		parent::__construct();
 
 		$this->langCode = $langCode;
 		$this->sectionId = $sectionId;
 		$this->verticalId = $verticalId;
+		$this->cityId = $cityId;
+		$this->hubsVersion = $hubsVersion;
 		$this->skinName = RequestContext::getMain()->getSkin()->getSkinName();
 	}
 
 	abstract public function getStructuredData($data);
 
-	static public function getModuleByName($name, $langCode, $sectionId, $verticalId) {
+	/**
+	 * @param $name
+	 * @param $langCode
+	 * @param $sectionId
+	 * @param $verticalId
+	 * @return MarketingToolboxModuleService
+	 */
+	static public function getModuleByName($name, $langCode, $sectionId, $verticalId, $cityId = 0, $hubVersion = 2) {
 		$moduleClassName = self::CLASS_NAME_PREFIX . $name . self::CLASS_NAME_SUFFIX;
-		return new $moduleClassName($langCode, $sectionId, $verticalId);
+		return new $moduleClassName($langCode, $sectionId, $verticalId, $cityId, $hubVersion);
+	}
+
+	public function setHubsVersion($version) {
+		$this->hubsVersion = $version;
+	}
+
+	public function getHubsVersion() {
+		return $this->hubsVersion;
+	}
+
+	protected function getHubsParams() {
+		$params = null;
+		$version = $this->getHubsVersion();
+
+		switch($version) {
+			case 3: 	$params = $this->cityId; break;
+			case 2:
+			default:	$params = [
+							'langCode' => $this->langCode,
+							'sectionId' => $this->sectionId,
+							'verticalId' => $this->verticalId,
+						];
+		}
+
+		return $params;
 	}
 
 	public function render($data) {
@@ -29,10 +66,10 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 	}
 
 	public function loadData($model, $params) {
+		$hubParams = $this->getHubsParams();
+
 		$lastTimestamp = $model->getLastPublishedTimestamp(
-			$this->langCode,
-			$this->sectionId,
-			$this->verticalId,
+			$hubParams,
 			$params['ts']
 		);
 
@@ -44,14 +81,18 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 			}
 		);
 
+		if ( $this->getShouldFilterCommercialData() ) {
+			$structuredData = $this->filterCommercialData( $structuredData );
+		}
+
 		return $structuredData;
 	}
 
 	protected function loadStructuredData( $model, $params ) {
+		$hubParams = $this->getHubsParams();
+
 		$moduleData = $model->getPublishedData(
-			$this->langCode,
-			$this->sectionId,
-			$this->verticalId,
+			$hubParams,
 			$params['ts'],
 			$this->getModuleId()
 		);
@@ -68,7 +109,7 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 		}
 
 		return $structuredData;
-		}
+	}
 
 	protected function getModuleId() {
 		return static::MODULE_ID;
@@ -83,7 +124,7 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 	}
 
 	/**
-	 * @desc Creates sponsored image markup which is then passed to wfMessage()
+	 * Creates sponsored image markup which is then passed to wfMessage()
 	 *
 	 * @param $imageTitleText
 	 * @return string
@@ -129,6 +170,7 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 			$this->verticalId,
 			$this->langCode,
 			$this->getModuleId(),
+			$this->cityId,
 			$skin
 		);
 	}
@@ -141,4 +183,32 @@ abstract class MarketingToolboxModuleService extends WikiaService {
 		return false;
 	}
 
+	/**
+	 * @param $filterCommercialData
+	 */
+	public function setShouldFilterCommercialData( $filterCommercialData ) {
+		$this->shouldFilterCommercialData = $filterCommercialData;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getShouldFilterCommercialData() {
+		return $this->shouldFilterCommercialData;
+	}
+
+	/**
+	 * @param $data
+	 * @return mixed
+	 */
+	protected function filterCommercialData( $data ) {
+		return $data;
+	}
+
+	/**
+	 * @return LicensedWikisService
+	 */
+	protected function getLicensedWikisService() {
+		return new LicensedWikisService();
+	}
 }

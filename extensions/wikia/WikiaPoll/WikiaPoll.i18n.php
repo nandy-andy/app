@@ -36,7 +36,8 @@ $messages['qqq'] = array(
 * $1 is the number of users that have voted.',
 	'wikiapoll-question' => 'Used as a title. Parameter:
 * $1 is the poll question without a question mark.',
-	'wikiapoll-thanks-for-vote' => 'Thank you to voting user.',
+	'wikiapoll-thanks-for-vote' => 'Thank you to voting user.
+{{Identical|Thank}}',
 	'wikiapoll-vote' => 'Button text to vote in a poll.
 {{Identical|Vote}}',
 	'wikiapoll-votes' => 'Parameter:
@@ -47,8 +48,10 @@ $messages['qqq'] = array(
 	'wikiapoll-question-label' => 'Form Label for Special Page.
 {{Identical|Question}}',
 	'wikiapoll-addnewitem-label' => 'Special Page text next to button for a new item to a poll',
-	'wikiapoll-cancel-label' => 'Cancel button label',
-	'wikiapoll-publish-label' => 'Create/Edit Poll button label for confirming changes',
+	'wikiapoll-cancel-label' => 'Cancel button label.
+{{Identical|Cancel}}',
+	'wikiapoll-publish-label' => 'Create/Edit Poll button label for confirming changes.
+{{Identical|Publish}}',
 	'wikiapoll-error-duplicate' => 'Error message when user tries to create a poll that already exists',
 	'wikiapoll-error-invalid-title' => 'Error message when title of poll is invalid/empty',
 	'wikiamobile-wikiapoll-open-poll' => 'Text on a button to open poll in a modal',
@@ -110,6 +113,7 @@ $messages['ar'] = array(
 $messages['az'] = array(
 	'wikiapoll-question' => '$1?',
 	'wikiapoll-thanks-for-vote' => 'Təşəkkürlər!',
+	'wikiapoll-vote' => 'Səs ver!',
 	'wikiapoll-question-label' => 'Sual',
 	'wikiapoll-cancel-label' => 'Ləğv et',
 	'wikiapoll-publish-label' => 'Naşir',
@@ -168,6 +172,8 @@ $messages['br'] = array(
 	'wikiapoll-addnewitem-label' => 'Ouzhpennañ un elfenn nevez',
 	'wikiapoll-cancel-label' => 'Nullañ',
 	'wikiapoll-publish-label' => 'Embann',
+	'wikiapoll-error-duplicate' => 'Ur sontadeg en anv-se zo anezhi dija.',
+	'wikiapoll-error-invalid-title' => 'Direizh eo testenn ar goulenn.',
 	'wikiamobile-wikiapoll-open-poll' => 'Petra a soñjit ?',
 	'wikiamobile-wikiapoll-thanks-voting' => "Trugarez deoc'h da vezañ votet !",
 	'wikiamobile-wikiapoll-poll' => 'Sontadeg',
@@ -199,7 +205,14 @@ $messages['ca'] = array(
 	'wikiamobile-wikiapoll-user-voted' => 'Has votat per " $1 "',
 );
 
-/** Czech (česky)
+/** Chechen (нохчийн)
+ * @author Умар
+ */
+$messages['ce'] = array(
+	'wikiapoll-thanks-for-vote' => 'Баркалла!',
+);
+
+/** Czech (čeština)
  * @author Chmee2
  * @author Dontlietome7
  * @author Reaperman
@@ -260,6 +273,7 @@ $messages['de'] = array(
 
 /** Zazaki (Zazaki)
  * @author Erdemaslancan
+ * @author Mirzali
  */
 $messages['diq'] = array(
 	'wikiapoll-people-voted' => '{{PLURAL:$1|$1 merduma|$1 merduman}} rey da',
@@ -271,7 +285,7 @@ $messages['diq'] = array(
 	'wikiapoll-editpoll-headline' => 'Anketi bıvurnê',
 	'wikiapoll-question-label' => 'Pers',
 	'wikiapoll-addnewitem-label' => 'Çiyo newe de ke',
-	'wikiapoll-cancel-label' => 'Bıterkne',
+	'wikiapoll-cancel-label' => 'Bıtexelne',
 	'wikiapoll-publish-label' => 'Vıla ke',
 	'wikiamobile-wikiapoll-poll' => 'Anket',
 );
@@ -305,12 +319,13 @@ $messages['es'] = array(
 
 /** Basque (euskara)
  * @author An13sa
+ * @author Xabier Armendaritz
  */
 $messages['eu'] = array(
 	'wikiapoll-desc' => 'Bozketak sortzeko eta kudeatzeko erraztasuna ahalbidetzen du',
 	'wikiapoll-people-voted' => '{{PLURAL:$1|pertsona $1-ek bozkatu du|$1 pertsonak bozkatu dute}}',
 	'wikiapoll-question' => '$1?',
-	'wikiapoll-thanks-for-vote' => 'Eskerrikasko!',
+	'wikiapoll-thanks-for-vote' => 'Eskerrik asko!',
 	'wikiapoll-vote' => 'Bozkatu!',
 	'wikiapoll-votes' => '({{PLURAL:$1|bozka $1|$1 bozka}})',
 	'wikiapoll-createpoll-headline' => 'Bozketa sortu',
@@ -321,6 +336,18 @@ $messages['eu'] = array(
 	'wikiapoll-publish-label' => 'Argitaratu',
 	'wikiapoll-error-duplicate' => 'Izen hori duen bozketa existitzen da.',
 	'wikiapoll-error-invalid-title' => 'Galderaren testua ez da onartzen.',
+);
+
+/** Persian (فارسی)
+ * @author Reza1615
+ */
+$messages['fa'] = array(
+	'wikiapoll-thanks-for-vote' => 'سپاس!',
+	'wikiapoll-vote' => 'ثبت رای!',
+	'wikiapoll-question-mark-after' => '؟',
+	'wikiapoll-question-label' => 'پرسش',
+	'wikiapoll-cancel-label' => 'لغو',
+	'wikiamobile-wikiapoll-thanks-voting' => 'از رای دادنتان متشکریم!',
 );
 
 /** Finnish (suomi)
@@ -459,6 +486,18 @@ $messages['it'] = array(
 	'wikiapoll-publish-label' => 'Pubblica',
 	'wikiapoll-error-duplicate' => 'Un sondaggio con quel nome esiste già.',
 	'wikiapoll-error-invalid-title' => 'Il testo della domanda non è valido.',
+);
+
+/** Japanese (日本語)
+ * @author BryghtShadow
+ * @author Tommy6
+ */
+$messages['ja'] = array(
+	'wikiapoll-votes' => '{{PLURAL:$1|$1 票}}',
+	'wikiamobile-wikiapoll-open-poll' => '投票にご協力ください',
+	'wikiamobile-wikiapoll-thanks-voting' => 'ご投票ありがとうございます!',
+	'wikiamobile-wikiapoll-poll' => '投票',
+	'wikiamobile-wikiapoll-user-voted' => '「$1」に投票しました',
 );
 
 /** Kurdish (Latin script) (Kurdî (latînî)‎)
@@ -706,8 +745,8 @@ $messages['ps'] = array(
 	'wikiapoll-createpoll-headline' => 'ټولپوښتنه جوړول',
 	'wikiapoll-editpoll-headline' => 'ټولپوښتنه سمول',
 	'wikiapoll-question-label' => 'پوښتنه',
-	'wikiapoll-addnewitem-label' => 'نوی توکی ورګډول',
-	'wikiapoll-cancel-label' => 'ناګارل',
+	'wikiapoll-addnewitem-label' => 'نوی توکی ورگډول',
+	'wikiapoll-cancel-label' => 'ناگارل',
 	'wikiapoll-publish-label' => 'خپرول',
 	'wikiapoll-error-duplicate' => 'په دې نوم يوه ټولپوښتنه له پخوا نه شته.',
 	'wikiapoll-error-invalid-title' => 'د پوښتنې متن سم نه دی.',
@@ -999,6 +1038,30 @@ $messages['uk'] = array(
 	'wikiamobile-wikiapoll-thanks-voting' => 'Дякуємо за участь у голосуванні!',
 	'wikiamobile-wikiapoll-poll' => 'Опитування',
 	'wikiamobile-wikiapoll-user-voted' => 'Ви проголосували за $1',
+);
+
+/** Vietnamese (Tiếng Việt)
+ * @author Baonguyen21022003
+ */
+$messages['vi'] = array(
+	'wikiapoll-desc' => 'Cung cấp một cách dễ dàng để tạo và quản lý thăm dò ý kiến',
+	'wikiapoll-people-voted' => '{{PLURAL:$1|$1person|$1 người}} bình chọn',
+	'wikiapoll-question' => '$1?',
+	'wikiapoll-thanks-for-vote' => 'Cảm ơn!',
+	'wikiapoll-vote' => 'Bình chọn!',
+	'wikiapoll-votes' => '{{PLURAL:$1|$1 vote|$1 bình chọn}}',
+	'wikiapoll-createpoll-headline' => 'Tạo thăm dò ý kiến',
+	'wikiapoll-editpoll-headline' => 'Chỉnh sửa thăm dò ý kiến',
+	'wikiapoll-question-label' => 'Câu hỏi',
+	'wikiapoll-addnewitem-label' => 'Thêm mục mới',
+	'wikiapoll-cancel-label' => 'Hủy bỏ',
+	'wikiapoll-publish-label' => 'Đăng',
+	'wikiapoll-error-duplicate' => 'Một thăm dò ý kiến với tên đó đã tồn tại.',
+	'wikiapoll-error-invalid-title' => 'Văn bản câu hỏi là không hợp lệ.',
+	'wikiamobile-wikiapoll-open-poll' => 'Bạn nghĩ gì?',
+	'wikiamobile-wikiapoll-thanks-voting' => 'Cảm ơn bạn đã bỏ phiếu!',
+	'wikiamobile-wikiapoll-poll' => 'Bảng thăm dò',
+	'wikiamobile-wikiapoll-user-voted' => 'Bạn đã bỏ phiếu cho "$1"',
 );
 
 /** Simplified Chinese (中文（简体）‎)

@@ -134,6 +134,7 @@ $messages['qqq'] = array(
 	'action-toplists-create-edit-list' => '{{doc-action|toplists-create-edit}}',
 	'toplists-editor-remove-item-tooltip' => '{{Identical|Remove item}}',
 	'toplists-create-button' => '{{Identical|Create list}}',
+	'toplists-cancel-button' => '{{Identical|Cancel}}',
 	'toplits-image-browser-selected-picture' => '$1 is the title of the image page.',
 	'toplists-image-browser-upload-btn' => '{{Identical|Choose}}',
 	'toplists-list-vote-up' => 'Keep this as short as possible. Everything exceeding allowed lenght will be cutted out!',
@@ -145,6 +146,7 @@ $messages['qqq'] = array(
 
 /** Arabic (العربية)
  * @author Achraf94
+ * @author Claw eg
  * @author Imksa
  * @author Meno25
  * @author OsamaK
@@ -189,6 +191,8 @@ $messages['ar'] = array(
 	'toplists-update-button' => 'احفظ القائمة',
 	'toplists-cancel-button' => 'إلغاء',
 	'toplists-items-removed' => 'تمت إزالة {{PLURAL:$1|عنصر واحد|$1 عناصر}}',
+	'toplists-items-created' => 'أنشئت $1 {{PLURAL:$1|عنصر واحد|2=عنصران|عناصر|$1 عنصر}}',
+	'toplists-items-updated' => 'تحديث $1 {{PLURAL:$1|عنصر واحد|2=عنصرين|عناصر|$1 عنصر}}',
 	'toplists-items-nochange' => 'لا يوجد تغيير في العناصر',
 	'toplits-image-browser-no-picture-selected' => 'ليست هناك صورة مختارة',
 	'toplits-image-browser-clear-picture' => 'صورة واضحة',
@@ -222,6 +226,11 @@ $3
 -ويكيا
 
 يمكنك  <a href="$4">إلغاء الإشتراك</a> من خلال التغييرات  للقائمة.',
+	'toplists-seconds' => '{{PLURAL:$1|ثانية واحدة|ثانيتان|$1 ثوان|$1 ثانية}}',
+	'toplists-minutes' => '{{PLURAL:$1|دقيقة واحدة|دقيقتان|$1 دقائق|$1 دقيقة}}',
+	'toplists-hours' => '({{PLURAL:$1||ساعة واحدة|ساعتان|$1 ساعات|$1 ساعة}})',
+	'toplists-days' => '{{PLURAL:$1||يوم واحد|يومان|$1 أيام|$1 يومًا|$1 يوم}}',
+	'toplists-weeks' => '{{PLURAL:$1||أسبوع واحد|أسبوعان|$1 أسابيع|$1 أسبوعًا|$1 أسبوع}}',
 	'toplists-msg-fb-OnRateArticle-short' => 'صوت على قائمة أفضل 10 في $WIKINAME!',
 	'toplists-create-heading' => '<em>خاصية جديدة!</em> إنشاء قائمة أفضل عشرة خاصة بك',
 	'toplists-create-button-msg' => 'إنشاء قائمة',
@@ -347,12 +356,28 @@ Gellout a rit <a href="$4">paouez da resevout</a> kemmoù ar roll-mañ.',
 );
 
 /** Catalan (català)
+ * @author Light of Cosmos
  * @author Marcmpujol
  */
 $messages['ca'] = array(
 	'toplists-desc' => 'Els 10 millors',
 	'right-toplists-create-edit-list' => 'Crea i edita pàgines dels 10 millors',
 	'right-toplists-create-item' => 'Crea y afegeix elements a una pàgina dels 10 millors',
+	'toplists-editor-description-placeholder' => 'Introduïu una descripció',
+	'toplists-editor-image-browser-tooltip' => 'Afegir una imatge',
+	'toplists-editor-remove-item-tooltip' => 'Esborrar ítem',
+	'toplists-create-button' => 'Crear llista',
+	'toplists-update-button' => 'Desar llista',
+	'toplists-cancel-button' => 'Cancel·la',
+	'toplits-image-browser-clear-picture' => 'Imatge clara',
+	'toplists-image-browser-upload-btn' => 'Escollir',
+	'toplists-image-browser-upload-label' => 'Carrega el teu propi',
+	'toplists-list-creation-summary' => 'Creant una llista, $1',
+	'toplists-item-remove-summary' => 'Element esborrat de la llista',
+	'toplists-item-restored' => 'Ítem restaurat',
+	'toplists-list-related-to' => 'Relacionat amb:',
+	'toplists-list-votes-num' => '{{PLURAL:$1|1<br />vot|$1<br />vots}}',
+	'toplists-list-created-by' => 'per [[User:$1|$1]]',
 );
 
 /** Chechen (нохчийн)
@@ -360,10 +385,14 @@ $messages['ca'] = array(
  */
 $messages['ce'] = array(
 	'toplists-editor-related-article-placeholder' => 'ДӀаязъе йолуш йолу агӀона цӀе',
+	'toplists-editor-description-placeholder' => 'ДӀаязде цунах лаьцна',
 	'toplists-update-button' => 'МогӀам Ӏалашбар',
+	'toplists-image-browser-upload-btn' => 'Харжа',
+	'toplists-seconds' => '$1 {{PLURAL:$1|секунд}}',
+	'toplists-days' => '$1 {{PLURAL:$1|де}}',
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Chmee2
  * @author Darth Daron
  */
@@ -542,6 +571,7 @@ Du kannst die Änderungsbenachrichtigungen zu dieser Liste <a href="$4">abbestel
 
 /** Zazaki (Zazaki)
  * @author Erdemaslancan
+ * @author Mirzali
  */
 $messages['diq'] = array(
 	'toplists-desc' => 'listey Tewr 10a',
@@ -552,7 +582,7 @@ $messages['diq'] = array(
 	'toplists-editor-image-browser-tooltip' => 'Resim deke',
 	'toplists-create-button' => 'Liste vırazê',
 	'toplists-update-button' => 'Listi qeyd ke',
-	'toplists-cancel-button' => 'Bıterkne',
+	'toplists-cancel-button' => 'Bıtexelne',
 	'toplists-items-removed' => '$1 {{PLURAL:$1|çi|çiy}} wedariyaya',
 	'toplists-items-created' => '$1 {{PLURAL:$1|çi|çiy}} vıraziyay',
 	'toplists-items-updated' => '$1 {{PLURAL:$1|çi|çiy}} rocneya',
@@ -669,18 +699,24 @@ Puedes <a href="$4">cancelar</a>  tu subscripción de los cambios a la lista.',
 
 /** Persian (فارسی)
  * @author Mjbmr
+ * @author Reza1615
  */
 $messages['fa'] = array(
 	'toplists-editor-title-label' => 'نام فهرست',
+	'toplists-editor-image-browser-tooltip' => 'افزودن یک تصویر',
 	'toplists-editor-remove-item-tooltip' => 'حذف مورد',
 	'toplists-create-button' => 'ایجاد فهرست',
 	'toplists-update-button' => 'ذخیره فهرست',
 	'toplists-cancel-button' => 'لغو',
 	'toplists-image-browser-upload-btn' => 'انتخاب',
+	'toplists-list-vote-up' => 'رای موافق',
+	'toplists-createpage-dialog-label' => '۱۰ فهرست برتر',
+	'toplists-seconds' => '$1 {{PLURAL:$1|ثانیه|ثانیه}}',
 );
 
 /** Finnish (suomi)
  * @author Centerlink
+ * @author Elseweyr
  * @author Ilkea
  * @author Nike
  */
@@ -708,10 +744,13 @@ $messages['fi'] = array(
 	'toplists-error-add-item-permission' => 'Käyttöoikeusvirhe: Tilille ei ole myönnetty oikeutta luoda uusia kohteita.',
 	'toplists-error-add-item-list-not-exists' => 'Top10-listaa $1 ei ole olemassa.',
 	'toplists-upload-error-unknown' => 'Tapahtui virhe lataus prosessissa. Yritä uudestaan.',
+	'action-toplists-create-edit-list' => 'luoda tai muokata top-10-listoja',
 	'toplists-editor-title-label' => 'Luettelonimi',
 	'toplists-editor-title-placeholder' => 'Kirjoita luettelon nimi',
 	'toplists-editor-related-article-label' => 'Liittyvä sivu <small>(valinnainen, mutta valitsee kuvan)</small>',
 	'toplists-editor-related-article-placeholder' => 'Anna olemassa olevan sivun nimi',
+	'toplists-editor-description-label' => 'Lyhyt kuvaus omasta top-10-listastasi',
+	'toplists-editor-description-placeholder' => 'Lisää kuvaus',
 	'toplists-editor-image-browser-tooltip' => 'Lisää kuva',
 	'toplists-editor-remove-item-tooltip' => 'Poista kohde',
 	'toplists-editor-drag-item-tooltip' => 'Voit muuttaa järjestystä vetämällä',
@@ -764,6 +803,7 @@ Voit <a href="$4">perua päivitykset</a> luettelon muutoksista.',
 	'toplists-msg-fb-OnRateArticle-short' => 'on äänestänyt Top10-listaa wikissä $WIKINAME!',
 	'toplists-create-heading' => '<em>Uutta!</em> Luo oma top-10',
 	'toplists-create-button-msg' => 'Luo lista',
+	'toplists-oasis-only' => 'Top-10-listojen luonti ja muokkaus ei ole mahdollista Monobook-ulkoasua käytettäessä. Mikäli haluat käyttää tätä toimintoa, muuta asetuksissasi ulkoasuksi "Wikia".',
 );
 
 /** French (français)
@@ -863,6 +903,7 @@ Vous pouvez <a href="$4">vous désinscrire</a> des modifications de cette liste.
 
 /** Galician (galego)
  * @author Toliño
+ * @author Vivaelcelta
  * @author Xanocebreiro
  */
 $messages['gl'] = array(
@@ -880,7 +921,7 @@ $messages['gl'] = array(
 	'toplists-error-title-spam' => 'O texto especificado contén algunhas palabras identificadas como spam.',
 	'toplists-error-article-blocked' => 'Non ten permiso para crear unha páxina con ese nome. Sentímolo.',
 	'toplists-error-article-not-exists' => '"$1" non existe. Quere <a href="$2" target="_blank">crealo</a>?',
-	'toplists-error-picture-not-exists' => '"$1" non existe. Quere <a href="$2" target="_blank">cargala</a>?',
+	'toplists-error-picture-not-exists' => '"$1" non existe. Queres <a href="$2" target="_blank">subila</a>?',
 	'toplists-error-duplicated-entry' => 'Non pode usar o mesmo nome máis dunha vez.',
 	'toplists-error-empty-item-name' => 'O nome dun elemento existente non pode estar baleiro.',
 	'toplists-item-cannot-delete' => 'Houbo un erro ao borrar este elemento.',
@@ -888,7 +929,7 @@ $messages['gl'] = array(
 	'toplists-error-add-item-anon' => 'Aos usuarios anónimos non se lles permite engadir elementos ás listas. <a class="ajaxLogin" id="login" href="$1">Acceda ao sistema</a> ou <a href="$2">rexistre unha nova conta</a>.',
 	'toplists-error-add-item-permission' => 'Erro de permisos: A súa conta non ten os dereitos necesarios para crear novos elementos.',
 	'toplists-error-add-item-list-not-exists' => 'A lista dos 10 mellores "$1" non existe.',
-	'toplists-upload-error-unknown' => 'Houbo un erro ao procesar a petición de subida. Inténteo de novo.',
+	'toplists-upload-error-unknown' => 'Houbo un erro ao procesar a petición de subida. Inténtao de novo.',
 	'action-toplists-create-edit-list' => 'crear e editar as páxinas dos 10 mellores',
 	'toplists-editor-title-label' => 'Nome da lista',
 	'toplists-editor-title-placeholder' => 'Escriba un nome para a lista',
@@ -912,7 +953,7 @@ $messages['gl'] = array(
 	'toplits-image-browser-clear-picture' => 'Borrar a imaxe',
 	'toplits-image-browser-selected-picture' => 'Selección actual: $1',
 	'toplists-image-browser-upload-btn' => 'Elixir',
-	'toplists-image-browser-upload-label' => 'Cargar a súa',
+	'toplists-image-browser-upload-label' => 'Subir a túa',
 	'toplists-list-creation-summary' => 'Creando unha lista, $1',
 	'toplists-list-update-summary' => 'Actualizando unha lista, $1',
 	'toplists-item-creation-summary' => 'Creando un elemento da lista',
@@ -1314,10 +1355,10 @@ $messages['mk'] = array(
 - Викија
 
 Можете да се <a href="$4">отпишете</a> од ваквите известувања за промени на списокот.',
-	'toplists-seconds' => '$1 {{PLURAL:$1|секунда|секунди}}',
-	'toplists-minutes' => '$1 {{PLURAL:$1|минута|минути}}',
-	'toplists-hours' => '$1 {{PLURAL:$1|час|часа}}',
-	'toplists-days' => '$1 {{PLURAL:$1|ден|дена}}',
+	'toplists-seconds' => '{{PLURAL:$1|една секунда|$1 секунди}}',
+	'toplists-minutes' => '{{PLURAL:$1|една минута|$1 минути}}',
+	'toplists-hours' => '{{PLURAL:$1|еден час|$1 часа}}',
+	'toplists-days' => '{{PLURAL:$1|еден ден|$1 дена}}',
 	'toplists-weeks' => '$1 {{PLURAL:$1|недела|недели}}',
 	'toplists-msg-fb-OnRateArticle-short' => 'гласаше на списокот на 10 најкотирани на $WIKINAME!',
 	'toplists-create-heading' => '<em>Ново!</em> Создајте свои „10 најкотирани“',
@@ -1627,6 +1668,13 @@ Je kunt <a href="$4">uitschrijven</a> van wijzigingen op deze lijst.',
 	'toplists-create-heading' => '<em>Nieuw!</em> Maak je eigen Top 10 aan',
 );
 
+/** Occitan (occitan)
+ * @author Cedric31
+ */
+$messages['oc'] = array(
+	'toplists-editor-description-placeholder' => 'Entratz una descripcion',
+);
+
 /** Polish (polski)
  * @author BeginaFelicysym
  * @author Sovq
@@ -1818,15 +1866,15 @@ $messages['ps'] = array(
 	'toplists-category' => 'د سر 10 لړليکونه',
 	'toplists-editor-title-label' => 'د لړليک نوم',
 	'toplists-editor-related-article-label' => 'اړونده مخ <small>(د کارن په خوښه، خو يو انځور بايد وټاکل شي)</small>',
-	'toplists-editor-image-browser-tooltip' => 'يو انځور ورګډول',
-	'toplists-editor-add-item-label' => 'يو نوی توکی ورګډول',
+	'toplists-editor-image-browser-tooltip' => 'يو انځور ورگډول',
+	'toplists-editor-add-item-label' => 'يو نوی توکی ورگډول',
 	'toplists-create-button' => 'لړليک جوړول',
 	'toplists-update-button' => 'لړليک خوندي کول',
-	'toplists-cancel-button' => 'ناګارل',
+	'toplists-cancel-button' => 'ناگارل',
 	'toplists-image-browser-upload-btn' => 'ټاکل',
 	'toplists-list-votes-num' => '{{PLURAL:$1|1<br />رايه|$1<br />رايې}}',
 	'toplists-list-created-by' => 'د [[User:$1|$1]] لخوا',
-	'toplists-list-add-item-label' => 'توکی ورګډول',
+	'toplists-list-add-item-label' => 'توکی ورگډول',
 	'toplists-createpage-dialog-label' => 'د سر 10 لړليکونه',
 	'toplists-seconds' => '$1 {{PLURAL:$1|ثانيه|ثانيې}}',
 	'toplists-minutes' => '$1 {{PLURAL:$1|دقيقه|دقيقې}}',
@@ -1839,6 +1887,7 @@ $messages['ps'] = array(
 /** Portuguese (português)
  * @author GTNS
  * @author Hamilton Abreu
+ * @author Josep Maria 15.
  * @author Luckas
  * @author SandroHc
  * @author Waldir
@@ -1922,7 +1971,7 @@ Pode <a href="$4">cancelar a subscrição</a> de alterações à lista.',
 	'toplists-days' => '$1 {{PLURAL:$1|dia|dias}}',
 	'toplists-weeks' => '$1 {{PLURAL:$1|semana|semanas}}',
 	'toplists-msg-fb-OnRateArticle-short' => 'votou numa lista Top 10 na $WIKINAME!',
-	'toplists-create-heading' => '<em>Novo!</em> Crie o Seu Próprio Top 10',
+	'toplists-create-heading' => '<em>Novo!</em> Cria o teu próprio Top 10',
 	'toplists-create-button-msg' => 'Criar uma lista',
 );
 
@@ -2439,6 +2488,17 @@ $messages['uk'] = array(
 	'toplists-oasis-only' => 'Створення та редагування списків 10 популярних недоступне в Monobook. Якщо ви хотіли б скористатися цією функцією, то, будь ласка, перемкніть ваші налаштування на оболонку Вікія.',
 );
 
+/** Vietnamese (Tiếng Việt)
+ * @author Baonguyen21022003
+ */
+$messages['vi'] = array(
+	'toplists-seconds' => '$1 {{PLURAL:$1|giây|giây}}',
+	'toplists-minutes' => '$1 {{PLURAL:$1|phút|phút}}',
+	'toplists-hours' => '$1 {{PLURAL:$1|giờ|giờ}}',
+	'toplists-days' => '$1 {{PLURAL:$1|ngày|ngày}}',
+	'toplists-weeks' => '$1 {{PLURAL:$1|tuần|tuần}}',
+);
+
 /** Simplified Chinese (中文（简体）‎)
  * @author Dimension
  * @author Hydra
@@ -2450,10 +2510,17 @@ $messages['zh-hans'] = array(
 	'toplists-editor-title-placeholder' => '为列表命名',
 	'toplists-editor-description-placeholder' => '输入描述',
 	'toplists-editor-image-browser-tooltip' => '添加图片',
+	'toplists-editor-remove-item-tooltip' => '移除项目',
 	'toplists-editor-drag-item-tooltip' => '拖拽以改变顺序',
+	'toplists-editor-add-item-label' => '添加新项目',
+	'toplists-editor-add-item-tooltip' => '往列表中添加新项目',
 	'toplists-create-button' => '创建列表',
 	'toplists-update-button' => '保存列表',
 	'toplists-cancel-button' => '取消',
+	'toplists-items-removed' => '移除了$1个项目',
+	'toplists-items-created' => '创建了$1个项目',
+	'toplists-items-updated' => '更新了$1个项目',
+	'toplists-items-nochange' => '没有修改项目',
 	'toplits-image-browser-no-picture-selected' => '没有图片被选中',
 	'toplists-image-browser-upload-btn' => '选择',
 	'toplists-image-browser-upload-label' => '上载您自己的',

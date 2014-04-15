@@ -9,17 +9,17 @@
  * ContentEditable annotation factory.
  *
  * @class
- * @extends ve.NamedClassFactory
+ * @extends OO.Factory
  * @constructor
  */
 ve.ce.AnnotationFactory = function VeCeAnnotationFactory() {
 	// Parent constructor
-	ve.NamedClassFactory.call( this );
+	OO.Factory.call( this );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.AnnotationFactory, ve.NamedClassFactory );
+OO.inheritClass( ve.ce.AnnotationFactory, OO.Factory );
 
 /* Methods */
 

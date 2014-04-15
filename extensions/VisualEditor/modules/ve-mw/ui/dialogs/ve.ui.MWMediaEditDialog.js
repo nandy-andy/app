@@ -12,20 +12,21 @@
  * @extends ve.ui.MWDialog
  *
  * @constructor
- * @param {ve.ui.Surface} surface
- * @param {Object} [config] Config options
+ * @param {ve.ui.WindowSet} windowSet Window set this dialog is part of
+ * @param {Object} [config] Configuration options
  */
-ve.ui.MWMediaEditDialog = function VeUiMWMediaEditDialog( surface, config ) {
+ve.ui.MWMediaEditDialog = function VeUiMWMediaEditDialog( windowSet, config ) {
 	// Parent constructor
-	ve.ui.MWDialog.call( this, surface, config );
+	ve.ui.MWDialog.call( this, windowSet, config );
 
 	// Properties
+	this.mediaNode = null;
 	this.captionNode = null;
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.MWMediaEditDialog, ve.ui.MWDialog );
+OO.inheritClass( ve.ui.MWMediaEditDialog, ve.ui.MWDialog );
 
 /* Static Properties */
 
@@ -43,111 +44,127 @@ ve.ui.MWMediaEditDialog.static.toolbarGroups = [
 		'exclude': [
 			{ 'group': 'format' },
 			{ 'group': 'structure' },
-			'referenceList'
+			'referenceList',
+			'wikiaMediaInsert',
+			'mediaInsert',
+			'code',
+			'wikiaSourceMode'
 		]
 	}
 ];
 
 ve.ui.MWMediaEditDialog.static.surfaceCommands = [
-	'undo', 'redo', 'bold', 'italic', 'link', 'clear'
+	'undo', 'redo', 'bold', 'italic', 'link', 'clear',
+	'underline', 'subscript', 'superscript'
 ];
 
 /* Methods */
 
-/** */
+/**
+ * @inheritdoc
+ */
 ve.ui.MWMediaEditDialog.prototype.initialize = function () {
 	// Parent method
 	ve.ui.MWDialog.prototype.initialize.call( this );
 
 	// Properties
-	this.editPanel = new ve.ui.PanelLayout( {
-		'$$': this.frame.$$,
+	this.editPanel = new OO.ui.PanelLayout( {
+		'$': this.$,
 		'padded': true,
 		'scrollable': true
 	} );
-	this.captionFieldset = new ve.ui.FieldsetLayout( {
-		'$$': this.frame.$$,
+	this.captionFieldset = new OO.ui.FieldsetLayout( {
+		'$': this.$,
 		'label': ve.msg( 'visualeditor-dialog-media-content-section' ),
 		'icon': 'parameter'
 	} );
-	this.applyButton = new ve.ui.ButtonWidget( {
-		'$$': this.$$,
+	this.applyButton = new OO.ui.PushButtonWidget( {
+		'$': this.$,
 		'label': ve.msg( 'visualeditor-dialog-action-apply' ),
 		'flags': ['primary']
 	} );
 
 	// Events
-	this.applyButton.connect( this, { 'click': [ 'close', 'apply' ] } );
+	this.applyButton.connect( this, { 'click': [ 'close', { 'action': 'apply' } ] } );
 
 	// Initialization
-	this.editPanel.$.append( this.captionFieldset.$ );
-	this.$body.append( this.editPanel.$ );
-	this.$foot.append( this.applyButton.$ );
+	this.editPanel.$element.append( this.captionFieldset.$element );
+	this.$body.append( this.editPanel.$element );
+	this.$foot.append( this.applyButton.$element );
 };
 
-/** */
-ve.ui.MWMediaEditDialog.prototype.onOpen = function () {
-	var data, doc = this.surface.getModel().getDocument();
-
+/**
+ * @inheritdoc
+ */
+ve.ui.MWMediaEditDialog.prototype.setup = function ( data ) {
 	// Parent method
-	ve.ui.MWDialog.prototype.onOpen.call( this );
+	ve.ui.MWDialog.prototype.setup.call( this, data );
+
+	var newDoc, doc = this.surface.getModel().getDocument();
 
 	// Properties
-	this.captionNode = this.surface.getView().getFocusedNode().getModel().getCaptionNode();
+	this.mediaNode = this.surface.getView().getFocusedNode().getModel();
+	this.captionNode = this.mediaNode.getCaptionNode();
 	if ( this.captionNode && this.captionNode.getLength() > 0 ) {
-		data = doc.getData( this.captionNode.getRange(), true );
+		newDoc = doc.cloneFromRange( this.captionNode.getRange() );
 	} else {
-		data = [
+		newDoc = [
 			{ 'type': 'paragraph', 'internal': { 'generated': 'wrapper' } },
-			{ 'type': '/paragraph' }
+			{ 'type': '/paragraph' },
+			{ 'type': 'internalList' },
+			{ 'type': '/internalList' }
 		];
 	}
 
 	this.captionSurface = new ve.ui.SurfaceWidget(
-		new ve.dm.ElementLinearData( doc.getStore(), data ),
+		newDoc,
 		{
-			'$$': this.frame.$$,
+			'$': this.$,
 			'tools': this.constructor.static.toolbarGroups,
 			'commands': this.constructor.static.surfaceCommands
 		}
 	);
 
 	// Initialization
-	this.captionSurface.$.addClass( 'WikiaArticle' );
-	this.captionFieldset.$.append( this.captionSurface.$ );
+	this.captionSurface.$element.addClass( 'WikiaArticle' );
+	this.captionFieldset.$element.append( this.captionSurface.$element );
 	this.captionSurface.initialize();
 };
 
-/** */
-ve.ui.MWMediaEditDialog.prototype.onClose = function ( action ) {
-	var data, doc, surfaceModel = this.surface.getModel();
+/**
+ * @inheritdoc
+ */
+ve.ui.MWMediaEditDialog.prototype.teardown = function ( data ) {
+	var newDoc, doc,
+		surfaceModel = this.surface.getModel();
 
-	// Parent method
-	ve.ui.MWDialog.prototype.onClose.call( this );
+	// Data initialization
+	data = data || {};
 
-	if ( action === 'apply' ) {
-		data = this.captionSurface.getContent();
+	if ( data.action === 'apply' ) {
+		newDoc = this.captionSurface.getSurface().getModel().getDocument();
 		doc = surfaceModel.getDocument();
-		if ( this.captionNode ) {
-			// Replace the contents of the caption
-			surfaceModel.getFragment( this.captionNode.getRange(), true ).insertContent( data );
-		} else {
+		if ( !this.captionNode ) {
 			// Insert a new caption at the beginning of the image node
 			surfaceModel.getFragment()
 				.adjustRange( 1 )
 				.collapseRangeToStart()
-				.insertContent(
-					[ { 'type': 'mwImageCaption' } ]
-						.concat( data )
-						.concat( [ { 'type': '/mwImageCaption' } ] )
-				);
+				.insertContent( [ { 'type': 'mwImageCaption' }, { 'type': '/mwImageCaption' } ] );
+			this.captionNode = this.mediaNode.getCaptionNode();
 		}
+		// Replace the contents of the caption
+		surfaceModel.change(
+			ve.dm.Transaction.newFromDocumentReplace( doc, this.captionNode, newDoc )
+		);
 	}
 
 	// Cleanup
 	this.captionSurface.destroy();
 	this.captionSurface = null;
 	this.captionNode = null;
+
+	// Parent method
+	ve.ui.MWDialog.prototype.teardown.call( this, data );
 };
 
 /* Registration */

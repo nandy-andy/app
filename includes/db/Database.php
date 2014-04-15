@@ -2535,7 +2535,15 @@ abstract class DatabaseBase implements DatabaseType {
 		$sql = "DELETE FROM $table";
 
 		if ( $conds != '*' ) {
-			$sql .= ' WHERE ' . $this->makeList( $conds, LIST_AND );
+			if ( is_array( $conds ) ) {
+				$conds = $this->makeList( $conds, LIST_AND );
+			}
+			$sql .= ' WHERE ' . $conds;
+		}
+		
+		if ( strpos( $sql, '`user`' ) !== false ) {
+			global $wgDBname, $wgUser;
+			error_log( sprintf( "MOLI: (%s), user: %d: %s", $wgDBname, ( !empty($wgUser) ) ? $wgUser->getId() : 0, $sql ) );
 		}
 
 		return $this->query( $sql, $fname );

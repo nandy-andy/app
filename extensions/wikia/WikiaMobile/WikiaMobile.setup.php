@@ -53,6 +53,7 @@ $wgAutoloadClasses['WikiaMobileCategoryService'] = "{$dir}/WikiaMobileCategorySe
 $wgAutoloadClasses['WikiaMobileSharingService'] = "{$dir}/WikiaMobileSharingService.class.php";
 $wgAutoloadClasses['WikiaMobileErrorService'] = "{$dir}/WikiaMobileErrorService.class.php";
 $wgAutoloadClasses['WikiaMobileMediaService'] = "{$dir}/WikiaMobileMediaService.class.php";
+$wgAutoloadClasses['WikiaMobileTrendingArticlesService'] = "{$dir}/WikiaMobileTrendingArticlesService.class.php";
 
 /**
  * models
@@ -84,7 +85,7 @@ JSMessages::registerPackage( 'WkMbl', array(
 	'wikiamobile-video-not-friendly',
 	'wikiamobile-video-not-friendly-header',
 	'wikiamobile-ad-label',
-	'wikiamobile-shared-file-not-available',
+	'wikiamobile-shared-file-not-available'
 ) );
 
 JSMessages::registerPackage( 'SmartBanner', [
@@ -104,6 +105,7 @@ $wgHooks['MakeHeadline'][] = 'WikiaMobileHooks::onMakeHeadline';
 $wgHooks['LinkBegin'][] = 'WikiaMobileHooks::onLinkBegin';
 $wgHooks['CategoryPageView'][] = 'WikiaMobileHooks::onCategoryPageView';
 $wgHooks['ArticlePurge'][] = 'WikiaMobileHooks::onArticlePurge';
+$wgHooks['DoEditSectionLink'][] = 'WikiaMobileHooks::onDoEditSectionLink';
 
 //404 Pages
 $wgHooks['BeforeDisplayNoArticleText'][] = 'WikiaMobileHooks::onBeforeDisplayNoArticleText';
@@ -159,6 +161,7 @@ if ( empty( $wgWikiaMobileIncludeJSGlobals ) ) {
 			'wgDisableAnonymousEditing',
 			'wgNamespaceIds',
 			'wgExtensionsPath',
+			'wikiaPageIsCorporate',
 
 			//article
 			'wgArticlePath',
@@ -201,6 +204,7 @@ if ( empty( $wgWikiaMobileSupportedVideos ) ) {
 		'youtube',
 		'dailymotion',
 		'vimeo',
-		'bliptv'
+		'bliptv',
+		'uStream'
 	];
 }

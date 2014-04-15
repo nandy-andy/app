@@ -48,6 +48,13 @@ $messages['ast'] = array(
 	'imgplc-notinhistory' => 'Nun pues amestar una imaxe nel mou historial.',
 );
 
+/** Azerbaijani (azərbaycanca)
+ * @author Cekli829
+ */
+$messages['az'] = array(
+	'imgplc-image' => 'Şəkil',
+);
+
 /** Belarusian (Taraškievica orthography) (беларуская (тарашкевіца)‎)
  * @author Wizardist
  */
@@ -91,7 +98,7 @@ $messages['ca'] = array(
 	'imgplc-notinhistory-video' => 'No es pot afegir un vídeo en el mode historial.',
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Dontlietome7
  */
 $messages['cs'] = array(
@@ -171,6 +178,7 @@ $messages['fa'] = array(
 /** Finnish (suomi)
  * @author Centerlink
  * @author Crt
+ * @author Ville96
  */
 $messages['fi'] = array(
 	'imgplc-add-image' => 'Lisää kuva',
@@ -178,6 +186,7 @@ $messages['fi'] = array(
 	'imgplc-placeholder' => 'Paikanvaraaja',
 	'imgplc-image' => 'Kuva',
 	'imgplc-notinhistory' => 'Et voi lisätä kuvaa historiatilassa.',
+	'imgplc-notinhistory-video' => 'Et voi lisätä videota historiatilassa.',
 );
 
 /** Faroese (føroyskt)
@@ -330,6 +339,14 @@ $messages['lb'] = array(
 	'imgplc-notinhistory' => 'Dir kënnt am Historique Modus kee Bild derbäisetzen',
 );
 
+/** لوری (لوری)
+ * @author Mogoeilor
+ */
+$messages['lrc'] = array(
+	'imgplc-add-image' => 'اضاف کردن عسگ',
+	'imgplc-image' => 'عسگ',
+);
+
 /** Lithuanian (lietuvių)
  * @author Mantak111
  */
@@ -417,9 +434,11 @@ $messages['nn'] = array(
  */
 $messages['oc'] = array(
 	'imgplc-add-image' => 'Apondre un imatge',
+	'imgplc-add-video' => 'Apondre una vidèo',
 	'imgplc-placeholder' => 'Posicionador',
 	'imgplc-image' => 'Imatge',
 	'imgplc-notinhistory' => "Podètz pas apondre cap d'imatge en mòde istoric.",
+	'imgplc-notinhistory-video' => 'Podètz pas apondre cap de vidèo en mòde istoric.',
 );
 
 /** Polish (polski)
@@ -459,14 +478,16 @@ $messages['ps'] = array(
 
 /** Portuguese (português)
  * @author Hamilton Abreu
+ * @author Josep Maria 15.
  * @author Luckas
  */
 $messages['pt'] = array(
-	'imgplc-add-image' => 'Adicionar Imagem',
+	'imgplc-add-image' => 'Adicionar imagem',
 	'imgplc-add-video' => 'Adicionar vídeo',
 	'imgplc-placeholder' => 'Espaço reservado',
 	'imgplc-image' => 'Imagem',
-	'imgplc-notinhistory' => 'Não pode adicionar uma imagem no modo histórico.',
+	'imgplc-notinhistory' => 'Não podes adicionar uma imagem no modo histórico.',
+	'imgplc-notinhistory-video' => 'Não podes adicionar um vídeo no modo histórico.',
 );
 
 /** Brazilian Portuguese (português do Brasil)
@@ -532,6 +553,17 @@ $messages['sv'] = array(
 	'imgplc-notinhistory-video' => 'Du kan inte lägga till ett videoklipp i historikläget.',
 );
 
+/** Telugu (తెలుగు)
+ * @author Chaduvari
+ */
+$messages['te'] = array(
+	'imgplc-add-image' => 'బొమ్మను చేర్చు',
+	'imgplc-add-video' => 'వీడియోను చేర్చు',
+	'imgplc-image' => 'బొమ్మ',
+	'imgplc-notinhistory' => 'చరిత్ర మోడ్‍లో ఉండగా మీరు బొమ్మను చేర్చలేరు.',
+	'imgplc-notinhistory-video' => 'చరిత్ర మోడ్‍లో ఉండగా మీరు వీడియోను చేర్చలేరు.',
+);
+
 /** Tagalog (Tagalog)
  * @author AnakngAraw
  */
@@ -575,9 +607,15 @@ $messages['uk'] = array(
 );
 
 /** Vietnamese (Tiếng Việt)
+ * @author Baonguyen21022003
  */
 $messages['vi'] = array(
+	'imgplc-add-image' => 'Thêm hình ảnh',
 	'imgplc-add-video' => 'Thêm đoạn phim',
+	'imgplc-placeholder' => 'Giữ chỗ',
+	'imgplc-image' => 'Hình ảnh',
+	'imgplc-notinhistory' => 'Bạn không thể thêm một hình ảnh trong chế độ lịch sử.',
+	'imgplc-notinhistory-video' => 'Bạn không thể thêm một video ở chế độ lịch sử.',
 );
 
 /** Simplified Chinese (中文（简体）‎)

@@ -9,6 +9,9 @@
  * @author Sebastian Marzjan
  *
  */
+use \Wikia\Logger\WikiaLogger;
+
+ 
 class WikiaHomePageHelper extends WikiaModel {
 
 	const VIDEO_GAMES_SLOTS_VAR_NAME = 'wgWikiaHomePageVideoGamesSlots';
@@ -37,13 +40,15 @@ class WikiaHomePageHelper extends WikiaModel {
 	const INTERSTITIAL_SMALL_IMAGE_WIDTH = 115;
 	const INTERSTITIAL_SMALL_IMAGE_HEIGHT = 65;
 
-	const FAILSAFE_COMMUNITIES_COUNT = 280000;
-	const FAILSAFE_NEW_COMMUNITIES_COUNT = 200;
+	const FAILSAFE_COMMUNITIES_COUNT = 300000;
+	const FAILSAFE_NEW_COMMUNITIES_COUNT = 400;
+	const FAILSAFE_VISITORS = 100000000;
+	const FAILSAFE_MOBILE_PERCENTAGE = 25;
 
 	const WAM_SCORE_ROUND_PRECISION = 2;
 
 	const SLIDER_IMAGES_KEY = 'SliderImagesKey';
-	const WIKIA_HOME_PAGE_HELPER_MEMC_VERSION = 'v0.7';
+	const WIKIA_HOME_PAGE_HELPER_MEMC_VERSION = 'v0.8';
 
 	protected $visualizationModel = null;
 	protected $collectionsModel;
@@ -263,23 +268,66 @@ class WikiaHomePageHelper extends WikiaModel {
 		return $newCommunities;
 	}
 
+	public function getStatsIncludingFallbacks() {
+		$stats = $this->getStatsFromWF();
+
+		$stats[ 'edits' ] = $this->getEdits();
+		$stats[ 'communities' ] = $this->getTotalCommunities();
+		$stats[ 'newCommunities' ] = $this->getLastDaysNewCommunities();
+
+		$totalPages = intval( Wikia::get_content_pages() );
+		if ( $totalPages > $stats[ 'totalPages' ] ) {
+			$stats[ 'totalPages' ] = $totalPages;
+		}
+
+		if ( $stats[ 'mobilePercentage' ] < self::FAILSAFE_MOBILE_PERCENTAGE ) {
+			$stats[ 'mobilePercentage' ] = self::FAILSAFE_MOBILE_PERCENTAGE;
+		}
+
+		if ( $stats[ 'visitors' ] < self::FAILSAFE_VISITORS ) {
+			$stats[ 'visitors' ] = self::FAILSAFE_VISITORS;
+		}
+		return $stats;
+	}
+
+	public function getStatsFromWF() {
+		return WikiFactory::getVarValueByName('wgCorpMainPageStats', Wikia::COMMUNITY_WIKI_ID);
+	}
+
+	public function saveStatsToWF($statsValues) {
+		WikiFactory::setVarByName('wgCorpMainPageStats', Wikia::COMMUNITY_WIKI_ID, $statsValues);
+		$this->wg->Memc->delete($this->getStatsMemcacheKey());
+
+		$corpWikisLangs = array_keys((new CityVisualization())->getVisualizationWikisData());
+		$wikiaHubsHelper = new WikiaHubsServicesHelper();
+		foreach ($corpWikisLangs as $lang) {
+			$wikiaHubsHelper->purgeHomePageVarnish($lang);
+		}
+	}
 
 	/**
-	 * get stats from article
-	 * @param string $articleName
-	 * @return integer stats
+	 * Get information about hubs to display on wikia homepage in hubs section
+	 *
+	 * @param $corporateId corporate wiki id
+	 * @return mixed
 	 */
-	public function getStatsFromArticle($articleName) {
-		wfProfileIn(__METHOD__);
+	public function getHubSlotsFromWF($corporateId) {
+		$hubSlots = WikiFactory::getVarValueByName('wgWikiaHomePageHubsSlots', $corporateId);
+		return is_array( $hubSlots ) ? $hubSlots : [];
+	}
 
-		$title = Title::newFromText($articleName);
-		$article = new Article($title);
-		$content = $article->getRawText();
-		$stats = (empty($content)) ? 0 : $content;
+	/**
+	 * Save data about hub slots displayed on wikia homepage in hubs section.
+	 * After save memcache is purged to get fresh data on wikia homepage.
+	 *
+	 * @param $hubSlotsValues data containing hub wiki id, description and links
+	 * @param $corporateId corporate wiki id
+	 * @param $lang language code
+	 */
+	public function saveHubSlotsToWF($hubSlotsValues, $corporateId, $lang) {
+		WikiFactory::setVarByName('wgWikiaHomePageHubsSlots', $corporateId, $hubSlotsValues);
 
-		wfProfileOut(__METHOD__);
-
-		return intval($stats);
+		WikiaDataAccess::cachePurge( $this->getHubSlotsMemcacheKey( $lang ) );
 	}
 
 	/**
@@ -346,6 +394,19 @@ class WikiaHomePageHelper extends WikiaModel {
 		}
 
 		return $wikiStats;
+	}
+
+	/**
+	 * Get main vertical names
+	 *
+	 * @return array
+	 */
+	public function getWikiVerticals( $lang = 'en' ) {
+		return array(
+			WikiFactoryHub::CATEGORY_ID_GAMING => wfMessage('hub-Gaming')->inLanguage( $lang )->text(),
+			WikiFactoryHub::CATEGORY_ID_ENTERTAINMENT => wfMessage('hub-Entertainment')->inLanguage( $lang )->text(),
+			WikiFactoryHub::CATEGORY_ID_LIFESTYLE => wfMessage('hub-Lifestyle')->inLanguage( $lang )->text()
+		);
 	}
 
 	/**
@@ -634,6 +695,9 @@ class WikiaHomePageHelper extends WikiaModel {
 		if ($imageTitle instanceof Title) {
 			$imageId = $imageTitle->getArticleID();
 		}
+		WikiaLogger::instance()->debug( "Special:Promote", ['method' => __METHOD__, 'imageName' => $imageName,
+			'imageTitle' => $imageTitle, 'imageId' => $imageId] );
+		
 
 		wfProfileOut(__METHOD__);
 		return $imageId;
@@ -680,15 +744,18 @@ class WikiaHomePageHelper extends WikiaModel {
 	}
 
 	public function getWikiBatches($wikiId, $langCode, $numberOfBatches) {
+		wfProfileIn(__METHOD__);
+
 		$visualization = new CityVisualization();
-		/** @var CityVisualization $visualization */
 		$batches = $visualization->getWikiBatches($wikiId, $langCode, $numberOfBatches);
 
+		$out = array();
 		if (!empty($batches)) {
-			return $this->prepareBatchesForVisualization($batches);
-		} else {
-			return array();
+			$out = $this->prepareBatchesForVisualization($batches);
 		}
+
+		wfProfileOut(__METHOD__);
+		return $out;
 	}
 
 	public function prepareBatchesForVisualization($batches) {
@@ -705,10 +772,10 @@ class WikiaHomePageHelper extends WikiaModel {
 			if (!empty($batch[CityVisualization::PROMOTED_ARRAY_KEY])) {
 				//if there are any promoted wikis they should go firstly to big&medium slots
 				$promotedBatch = $batch[CityVisualization::PROMOTED_ARRAY_KEY];
-
-				$processedBatch[self::SLOTS_BIG_ARRAY_KEY] = $this->getProcessedWikisData($promotedBatch, self::SLOTS_BIG);
-				$processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY] = $this->getProcessedWikisData($promotedBatch, self::SLOTS_MEDIUM);
+			} else {
+				$promotedBatch = [];
 			}
+
 
 			if (empty($batch[CityVisualization::DEMOTED_ARRAY_KEY])) {
 				continue;
@@ -716,21 +783,24 @@ class WikiaHomePageHelper extends WikiaModel {
 				shuffle($batch[CityVisualization::DEMOTED_ARRAY_KEY]);
 			}
 
-			$bigCount = count($processedBatch[self::SLOTS_BIG_ARRAY_KEY]);
-			//if there wasn't enough promoted wikis fill big&medium slots with regural ones
-			if ($bigCount < self::SLOTS_BIG) {
-				$processedBatch[self::SLOTS_BIG_ARRAY_KEY] = array_merge($processedBatch[self::SLOTS_BIG_ARRAY_KEY], $this->getProcessedWikisData($batch[CityVisualization::DEMOTED_ARRAY_KEY], self::SLOTS_BIG, $bigCount));
+			$biggerSlotsWikis = array_slice($promotedBatch, 0, self::SLOTS_BIG + self::SLOTS_MEDIUM);
+			$promotedCount = count($biggerSlotsWikis);
+			if ($promotedCount < self::SLOTS_BIG + self::SLOTS_MEDIUM) {
+				$biggerSlotsWikis = array_merge(
+					$biggerSlotsWikis,
+					array_splice(
+						$batch[CityVisualization::DEMOTED_ARRAY_KEY],
+						0,
+						self::SLOTS_BIG + self::SLOTS_MEDIUM - $promotedCount
+					)
+				);
 			}
+			shuffle($biggerSlotsWikis);
+			$processedBatch[self::SLOTS_BIG_ARRAY_KEY] = array_splice($biggerSlotsWikis, 0, self::SLOTS_BIG);
+			$processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY] = array_splice($biggerSlotsWikis, 0, self::SLOTS_MEDIUM);
+			$processedBatch[self::SLOTS_SMALL_ARRAY_KEY] = $batch[CityVisualization::DEMOTED_ARRAY_KEY];
 
-			$mediumCount = count($processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY]);
-			if ($mediumCount < self::SLOTS_MEDIUM) {
-				$processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY] = array_merge($processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY], $this->getProcessedWikisData($batch[CityVisualization::DEMOTED_ARRAY_KEY], self::SLOTS_MEDIUM, $mediumCount));
-			}
-
-			$this->shufflePromotedWikis($processedBatch);
-
-			//put regular wikis to small slots
-			$processedBatch[self::SLOTS_SMALL_ARRAY_KEY] = $this->getProcessedWikisData($batch[CityVisualization::DEMOTED_ARRAY_KEY], self::SLOTS_SMALL);
+			$processedBatch = $this->prepareWikisForVisualization($processedBatch);
 			$processedBatches[] = $processedBatch;
 		}
 
@@ -738,51 +808,21 @@ class WikiaHomePageHelper extends WikiaModel {
 		return $processedBatches;
 	}
 
-	protected function getProcessedWikisData(&$batch, $orgLimit, $curLimit = 0) {
-		$result = array();
-
-		$size = $this->getProcessedWikisImgSizes($orgLimit);
-
-		for ($curLimit; $curLimit < $orgLimit; $curLimit++) {
-			$wiki = array_shift($batch);
-			$processedWiki = $this->extractWikiDataForBatch($wiki);
-			$processedWiki['image'] = $this->getImageUrl($processedWiki['main_image'], $size->width, $size->height);
-
-			if (!empty($processedWiki['wikiurl'])) {
-				$result[] = $processedWiki;
+	private function prepareWikisForVisualization($batch) {
+		foreach($batch as $slotName => &$wikis) {
+			$size = $this->getProcessedWikisImgSizes($slotName);
+			foreach($wikis as &$wiki) {
+				if (!empty($wiki['image'])) {
+					$wiki['main_image'] = $wiki['image'];
+				}
+				$wiki['image'] = ImagesService::overrideThumbnailFormat(
+					$this->getImageUrl($wiki['main_image'], $size->width, $size->height),
+					ImagesService::EXT_JPG
+				);
+				unset($wiki['main_image']);
 			}
 		}
-
-		return $result;
-	}
-
-	protected function shufflePromotedWikis(&$processedBatch) {
-		$promotedWikis = array_merge($processedBatch[self::SLOTS_BIG_ARRAY_KEY], $processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY]);
-
-		if (count($promotedWikis) !== (self::SLOTS_BIG + self::SLOTS_MEDIUM)) {
-			return;
-		}
-
-		$processedBatch[self::SLOTS_BIG_ARRAY_KEY] = array();
-		$processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY] = array();
-
-		shuffle($promotedWikis);
-
-		$processedBatch[self::SLOTS_BIG_ARRAY_KEY] = $this->reassignPromotedWikis($promotedWikis, self::SLOTS_BIG);
-		$processedBatch[self::SLOTS_MEDIUM_ARRAY_KEY] = $this->reassignPromotedWikis($promotedWikis, self::SLOTS_MEDIUM);
-	}
-
-	protected function reassignPromotedWikis(&$promotedWikis, $limit) {
-		$result = array();
-
-		$size = $this->getProcessedWikisImgSizes($limit);
-		for ($limit; $limit > 0; $limit--) {
-			$wiki = array_shift($promotedWikis);
-			$wiki['image'] = $this->getImageUrl($wiki['main_image'], $size->width, $size->height);
-			$result[] = $wiki;
-		}
-
-		return $result;
+		return $batch;
 	}
 
 	/**
@@ -790,18 +830,18 @@ class WikiaHomePageHelper extends WikiaModel {
 	 * @param integer $limit one of constants of this class reprezenting amount of slots
 	 * @return StdClass with width&height fields
 	 */
-	public function getProcessedWikisImgSizes($limit) {
+	public function getProcessedWikisImgSizes($slotName) {
 		$result = new StdClass;
-		switch ($limit) {
-			case self::SLOTS_SMALL:
+		switch ($slotName) {
+			case self::SLOTS_SMALL_ARRAY_KEY:
 				$result->width = $this->getRemixSmallImgWidth();
 				$result->height = $this->getRemixSmallImgHeight();
 				break;
-			case self::SLOTS_MEDIUM:
+			case self::SLOTS_MEDIUM_ARRAY_KEY:
 				$result->width = $this->getRemixMediumImgWidth();
 				$result->height = $this->getRemixMediumImgHeight();
 				break;
-			case self::SLOTS_BIG:
+			case self::SLOTS_BIG_ARRAY_KEY:
 			default:
 				$result->width = $this->getRemixBigImgWidth();
 				$result->height = $this->getRemixBigImgHeight();
@@ -915,20 +955,6 @@ class WikiaHomePageHelper extends WikiaModel {
 		return false;
 	}
 
-	protected function extractWikiDataForBatch($wiki) {
-		$processedWiki = array(
-			'wikiid' => $wiki['wikiid'],
-			'wikiname' => $wiki['wikiname'],
-			'wikiurl' => $wiki['wikiurl'],
-			'wikinew' => $wiki['wikinew'],
-			'wikihot' => $wiki['wikihot'],
-			'wikipromoted' => $wiki['wikipromoted'],
-			'wikiblocked' => $wiki['wikiblocked'],
-			'main_image' => !empty($wiki['image']) ? $wiki['image'] : $wiki['main_image']
-		);
-		return $processedWiki;
-	}
-
 	public function getVisualizationWikisData() {
 		return $this->getVisualization()->getVisualizationWikisData();
 	}
@@ -967,6 +993,25 @@ class WikiaHomePageHelper extends WikiaModel {
 			$wam = null;
 		}
 		return $wam;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getStatsMemcacheKey() {
+		$memKey = wfSharedMemcKey( 'wikiahomepage', 'stats', self::WIKIA_HOME_PAGE_HELPER_MEMC_VERSION );
+
+		return $memKey;
+	}
+
+	/**
+	 * @return string
+	 */
+	static public function getHubSlotsMemcacheKey( $lang ) {
+		$memKey = wfSharedMemcKey( 'wikiahomepage', 'hub-slots', $lang, self::WIKIA_HOME_PAGE_HELPER_MEMC_VERSION );
+
+		return $memKey;
 	}
 
 }

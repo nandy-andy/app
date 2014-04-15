@@ -56,12 +56,18 @@ Parameters:
 
 /** Arabic (العربية)
  * @author Achraf94
+ * @author Claw eg
  */
 $messages['ar'] = array(
 	'partner-feed-achievements-leaderboard' => 'قائمة متصدري الإنجازات الخاصة بالويكيات',
 	'partner-feed-earned-badges' => 'الإنجازات المتحصل عليها حديثا في ويكي محددة',
+	'partner-feed-recent-blog-posts' => 'مشاركات المدونات المؤخرة مرتبطة بترويج',
+	'partner-feed-latest-images' => 'معرض لأحدث الصور التي تم رفعها',
+	'partner-feed-hotcontent' => 'محور / قطاعات "المحتوى الساخن" كما هي مرتبة حسب عدد المحررين',
+	'partner-feed-recent-blog-comments' => 'تعليقات حديثة متعلقة بمشاركة مدونة محددة',
 	'partner-feed-recent-changes' => 'أحدث التغييرات',
 	'partnerfeed' => 'قائمة الشركاء',
+	'error-no-article' => 'خطأ: لا "مقالة" معلمة نجحت',
 	'feed-title-blogposts' => 'أحدث معلقات المدونة',
 	'feed-title-recent-badges' => 'أحدث الشارات',
 	'feed-title-recent-images' => 'أحدث الصور',
@@ -72,6 +78,7 @@ $messages['ar'] = array(
 	'feed-title-hot-content' => 'محتوى المحور - $1',
 	'feed-title-blogcomments' => 'التعليقات على $1',
 	'feed-title-recentchanges' => 'أحدث التغييرات',
+	'partner-feed-error-no-blogpost-found' => '<b>خطأ:</b> مشاركة المدونة $1 غير موجودة.',
 );
 
 /** Bulgarian (български)
@@ -90,9 +97,12 @@ $messages['bg'] = array(
 $messages['br'] = array(
 	'partner-feed-earned-badges' => 'Badjoù gounezet nevez zo gant ur Wiki difer',
 	'partner-feed-recent-changes' => 'Kemmoù diwezhañ',
+	'partnerfeed' => 'Keveler gwazh',
+	'error-no-article' => 'Fazi : N\'eo ket bet kaset an arventenn "pennad"',
 	'feed-title-blogposts' => 'Blogadennoù nevez',
 	'feed-title-recent-badges' => 'Badjoù diwezhañ',
 	'feed-title-recent-images' => 'Skeudennoù diwezhañ',
+	'feed-main-title' => 'Gwazh keveler Wikia',
 	'all-blog-posts' => 'an holl rummadoù',
 	'blog-posts-from-listing' => 'eus ar roll : $1',
 	'feed-title-blogcomments' => 'Evezhiadenn da $1',
@@ -134,7 +144,7 @@ $messages['ce'] = array(
 	'feed-title-recentchanges' => 'Керла нисдарш',
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Chmee2
  */
 $messages['cs'] = array(
@@ -176,12 +186,15 @@ $messages['de'] = array(
 
 /** Zazaki (Zazaki)
  * @author Erdemaslancan
+ * @author Marmase
+ * @author Mirzali
  */
 $messages['diq'] = array(
 	'partner-feed-recent-changes' => 'Vurnayışê peyêni',
 	'feed-title-recent-images' => 'Vurnayışê resiman',
 	'all-blog-posts' => 'kategoriy pêro',
 	'feed-title-blogcomments' => 'Vatışê - ($1)',
+	'feed-title-recentchanges' => 'Vurnayışê peyêni',
 );
 
 /** Spanish (español)
@@ -210,27 +223,53 @@ $messages['es'] = array(
 	'partner-feed-error-no-blogpost-found' => '<b>Error:</b> La entrada de blog $1 no existe.',
 );
 
+/** Basque (euskara)
+ * @author Subi
+ */
+$messages['eu'] = array(
+	'all-blog-posts' => 'kategoria guztiak',
+);
+
 /** Persian (فارسی)
  * @author BlueDevil
+ * @author Reza1615
  */
 $messages['fa'] = array(
 	'partner-feed-recent-changes' => 'تغییرات اخیر',
+	'feed-title-blogposts' => 'پست‌های اخیر وبلاگ',
+	'feed-title-recent-badges' => 'نشانهای اخیر',
 	'feed-title-recent-images' => 'تصاویر اخیر',
+	'feed-title-leaderboard' => 'تابلوی رهبری دستاوردها',
+	'feed-title-recentchanges' => 'تغییرات اخیر',
 );
 
 /** Finnish (suomi)
  * @author Centerlink
+ * @author Elseweyr
  * @author Nedergard
  * @author Nike
  * @author Tofu II
  */
 $messages['fi'] = array(
+	'partner-feed-achievements-leaderboard' => 'Wikien saavutuksien tilastot',
+	'partner-feed-earned-badges' => 'Äskettäin ansaitut merkit tietyssä wikissä',
+	'partner-feed-recent-blog-posts' => 'Uusimmat promootioon liittyvät blogiartikkelit',
+	'partner-feed-latest-images' => 'Viimeisimmäksi ladattujen kuvien galleria',
+	'partner-feed-recent-blog-comments' => 'Tiettyyn blogiartikkeliin liittyvät viimeisimmät kommentit.',
 	'partner-feed-recent-changes' => 'Viimeisimmät muutokset',
+	'partnerfeed' => 'Kumppanisyöte',
+	'error-no-article' => 'Virhe: Ei "artikkeli" -parametria annettu',
 	'feed-title-blogposts' => 'Tuoreet blogimerkinnät',
 	'feed-title-recent-badges' => 'Viimeaikaiset rintanapit',
 	'feed-title-recent-images' => 'Viimeaikaiset kuvat',
+	'feed-title-leaderboard' => 'Saavutuksien leaderboard',
+	'feed-main-title' => 'Wikia kumppanisyöte',
 	'all-blog-posts' => 'kaikki kategoriat',
+	'blog-posts-from-listing' => 'listauksesta $1',
+	'feed-title-hot-content' => 'Kuuma sisältö - $1',
+	'feed-title-blogcomments' => 'Kommentit artikkelista $1',
 	'feed-title-recentchanges' => 'Tuoreet muutokset',
+	'partner-feed-error-no-blogpost-found' => '<b>Virhe:</b> Blogiartikkelia $1 ei ole olemassa.',
 );
 
 /** French (français)
@@ -362,6 +401,14 @@ $messages['lb'] = array(
 	'feed-title-recentchanges' => 'Rezent Ännerungen',
 );
 
+/** لوری (لوری)
+ * @author Mogoeilor
+ */
+$messages['lrc'] = array(
+	'feed-title-recent-images' => 'عسکیا تازه باو',
+	'feed-title-recentchanges' => 'آلشتیا تازه باو',
+);
+
 /** Macedonian (македонски)
  * @author Bjankuloski06
  */
@@ -483,6 +530,15 @@ $messages['nl'] = array(
 	'partner-feed-error-no-blogpost-found' => '<b>Fout:</b> Blogbericht $1 bestaat niet.',
 );
 
+/** Occitan (occitan)
+ * @author Cedric31
+ * @author Hulothe
+ */
+$messages['oc'] = array(
+	'partner-feed-recent-changes' => 'Darrièrs cambiaments',
+	'feed-title-recentchanges' => 'Darrièrs cambiaments',
+);
+
 /** Polish (polski)
  * @author BeginaFelicysym
  * @author Sovq
@@ -572,6 +628,7 @@ $messages['pt'] = array(
 
 /** Brazilian Portuguese (português do Brasil)
  * @author Aristóbulo
+ * @author Cainamarques
  * @author Giro720
  */
 $messages['pt-br'] = array(
@@ -584,7 +641,7 @@ $messages['pt-br'] = array(
 	'partner-feed-recent-changes' => 'Mudanças recentes',
 	'partnerfeed' => 'Feed de um parceiro',
 	'error-no-article' => 'Erro: Não foi passado o parâmetro "article"',
-	'feed-title-blogposts' => 'Entradas recentes em blogues',
+	'feed-title-blogposts' => 'Posts recentes em blogues',
 	'feed-title-recent-badges' => 'Condecorações recentes',
 	'feed-title-recent-images' => 'Imagens recentes',
 	'feed-title-leaderboard' => 'Liderança de medalhas',
@@ -594,6 +651,7 @@ $messages['pt-br'] = array(
 	'feed-title-hot-content' => 'Conteúdo popular - $1',
 	'feed-title-blogcomments' => 'Comentários em $1',
 	'feed-title-recentchanges' => 'Mudanças recentes',
+	'partner-feed-error-no-blogpost-found' => '<b>Error:</b> O post $1 não existe.',
 );
 
 /** tarandíne (tarandíne)
@@ -746,6 +804,32 @@ $messages['uk'] = array(
 	'partner-feed-error-no-blogpost-found' => '<b>Помилка:</b> Повідомлення в блозі  $1  не існує.',
 );
 
+/** Vietnamese (Tiếng Việt)
+ * @author Baonguyen21022003
+ */
+$messages['vi'] = array(
+	'partner-feed-achievements-leaderboard' => 'Wiki bảng dẫn thành lựu',
+	'partner-feed-earned-badges' => 'Huy hiệu vừa đạt được cho một liên kết cụ thể',
+	'partner-feed-recent-blog-posts' => 'Bài viết blog gần đây liên quan đến một quảng cáo',
+	'partner-feed-latest-images' => 'Bộ sưu tập của những hình ảnh mới nhất mà đã được tải lên',
+	'partner-feed-hotcontent' => 'Trung tâm / dọc "nội dung nóng" như xếp hạng theo số biên tập viên',
+	'partner-feed-recent-blog-comments' => 'Ý kiến gần đây liên quan đến quy định bài đăng blog.',
+	'partner-feed-recent-changes' => 'Thay đổi gần đây',
+	'partnerfeed' => 'Nguồn cấp dữ liệu đối tác',
+	'error-no-article' => 'Lỗi: Không có tham số "bài viết" thông qua',
+	'feed-title-blogposts' => 'Blog đăng gần đây',
+	'feed-title-recent-badges' => 'Thay đổi phù hiệu gần đây',
+	'feed-title-recent-images' => 'Thay đổi hình ảnh gần đây',
+	'feed-title-leaderboard' => 'Bảng dẫn thành lựu',
+	'feed-main-title' => 'Wikia đối tác nguồn cấp dữ liệu',
+	'all-blog-posts' => 'Tất cả thể loại',
+	'blog-posts-from-listing' => 'từ bảng liệt kê: $1',
+	'feed-title-hot-content' => 'Nội dung nóng - $1',
+	'feed-title-blogcomments' => 'Bình luận cho $1',
+	'feed-title-recentchanges' => 'Thay đổi gần đây',
+	'partner-feed-error-no-blogpost-found' => '<b>Lỗi:</b> Bài đăng blog $1 không tồn tại.',
+);
+
 /** Simplified Chinese (中文（简体）‎)
  * @author Dimension
  * @author Hydra
@@ -758,6 +842,13 @@ $messages['zh-hans'] = array(
 	'partner-feed-recent-changes' => '最新更改',
 	'feed-title-blogposts' => '最新博客帖子',
 	'feed-title-recent-badges' => '最新徽章',
+	'feed-title-recent-images' => '最近的图片',
+	'feed-title-leaderboard' => '成就排行榜',
+	'feed-main-title' => 'Wikia合作伙伴订阅点',
 	'all-blog-posts' => '全部分类',
 	'blog-posts-from-listing' => '来自列表：$1',
+	'feed-title-hot-content' => '热点内容 - $1',
+	'feed-title-blogcomments' => '评论 $1',
+	'feed-title-recentchanges' => '最近更改',
+	'partner-feed-error-no-blogpost-found' => '<b>错误：</b>博客文章 $1 不存在。',
 );

@@ -28,19 +28,41 @@ $wgHooks['AfterInitialize']          [] = "Wikia::onAfterInitialize";
 $wgHooks['UserMailerSend']           [] = "Wikia::onUserMailerSend";
 $wgHooks['ArticleDeleteComplete']    [] = "Wikia::onArticleDeleteComplete";
 $wgHooks['ContributionsToolLinks']   [] = 'Wikia::onContributionsToolLinks';
-$wgHooks['AjaxAddScript'][] = 'Wikia::onAjaxAddScript';
+$wgHooks['AjaxAddScript']            [] = 'Wikia::onAjaxAddScript';
+$wgHooks['TitleGetSquidURLs']        [] = 'Wikia::onTitleGetSquidURLs';
+$wgHooks['OutputPageFavicon']        [] = 'Wikia::onOutputPageFavicon';
 
 # changes in recentchanges (MultiLookup)
 $wgHooks['RecentChange_save']        [] = "Wikia::recentChangesSave";
 $wgHooks['BeforeInitialize']         [] = "Wikia::onBeforeInitializeMemcachePurge";
 //$wgHooks['MediaWikiPerformAction']   [] = "Wikia::onPerformActionNewrelicNameTransaction"; disable to gather different newrelic statistics
 $wgHooks['SkinTemplateOutputPageBeforeExec'][] = "Wikia::onSkinTemplateOutputPageBeforeExec";
-$wgHooks['OutputPageCheckLastModified'][] = 'Wikia::onOutputPageCheckLastModified';
 $wgHooks['UploadVerifyFile']         [] = 'Wikia::onUploadVerifyFile';
 
 # User hooks
 $wgHooks['UserNameLoadFromId']       [] = "Wikia::onUserNameLoadFromId";
 $wgHooks['UserLoadFromDatabase']     [] = "Wikia::onUserLoadFromDatabase";
+
+# Swift file backend
+$wgHooks['AfterSetupLocalFileRepo']  [] = "Wikia::onAfterSetupLocalFileRepo";
+$wgHooks['BeforeRenderTimeline']     [] = "Wikia::onBeforeRenderTimeline";
+
+# remove "Temp_file_" from purger queue - BAC-1221
+$wgHooks['LocalFileExecuteUrls']     []  = 'Wikia::onLocalFileExecuteUrls';
+
+# send ETag response header - BAC-1227
+$wgHooks['ParserCacheGetETag']       [] = 'Wikia::onParserCacheGetETag';
+
+# Add X-Served-By and X-Backend-Response-Time response headers - BAC-550
+$wgHooks['BeforeSendCacheControl']    [] = 'Wikia::onBeforeSendCacheControl';
+$wgHooks['ResourceLoaderAfterRespond'][] = 'Wikia::onResourceLoaderAfterRespond';
+$wgHooks['NirvanaAfterRespond']       [] = 'Wikia::onNirvanaAfterRespond';
+
+# don't purge all variants of articles in Chinese - BAC-1278
+$wgHooks['TitleGetLangVariants'][] = 'Wikia::onTitleGetLangVariants';
+
+# don't purge all thumbs - PLATFORM-161
+$wgHooks['LocalFilePurgeThumbnailsUrls'][] = 'Wikia::onLocalFilePurgeThumbnailsUrls';
 
 /**
  * This class have only static methods so they can be used anywhere
@@ -52,7 +74,8 @@ class Wikia {
 	const VARNISH_STAGING_HEADER = 'X-Staging';
 	const VARNISH_STAGING_PREVIEW = 'preview';
 	const VARNISH_STAGING_VERIFY = 'verify';
-	const HEX_CHARS = '0123456789abcdef';
+	const REQUIRED_CHARS = '0123456789abcdefG';
+	const COMMUNITY_WIKI_ID = 177;
 
 	private static $vars = array();
 	private static $cachedLinker;
@@ -402,8 +425,12 @@ class Wikia {
 
 		$method = $sub ? $method . "-" . $sub : $method;
 		if( $wgDevelEnvironment || $wgErrorLog || $always ) {
-			// Currently this goes to syslog1's /var/log/httpd-info.log
-			error_log( $method . ":{$wgDBname}/{$wgCityId}:" . $message );
+			if (class_exists('Wikia\\Logger\\WikiaLogger')) {
+				$method = preg_match('/-WIKIA$/', $method) ? str_replace('-WIKIA', '', $method) : $method;
+				\Wikia\Logger\WikiaLogger::instance()->debug($message, ['method' => $method]);
+			} else {
+				error_log( $method . ":{$wgDBname}/{$wgCityId}:" . $message );
+			}
 		}
 		/**
 		 * commandline = echo
@@ -480,7 +507,7 @@ class Wikia {
 		$msg = "***** END *****";
 		Wikia::log($method, false, $msg, true /* $force */);
 	}
-	
+
 	/**
 	 * get staff person responsible for language
 	 *
@@ -1026,7 +1053,7 @@ class Wikia {
 	 * add entries to software info
 	 */
 	static public function softwareInfo( &$software ) {
-		global $wgCityId, $wgDBcluster, $wgWikiaDatacenter;
+		global $wgCityId, $wgDBcluster, $wgWikiaDatacenter, $wgLocalFileRepo;
 
 		if( !empty( $wgCityId ) ) {
 			$info = "city_id: {$wgCityId}";
@@ -1040,6 +1067,7 @@ class Wikia {
 		if( !empty( $wgWikiaDatacenter ) ) {
 			$info .= ", dc: $wgWikiaDatacenter";
 		}
+		$info .= ", file_repo: {$wgLocalFileRepo['backend']}";
 
 		$software[ "Internals" ] = $info;
 
@@ -1515,59 +1543,47 @@ class Wikia {
 	}
 
 	/**
-	 * Get list of all URLs to be purged for a given Title
+	 * Purge Common and Wikia and User css/js when those files are edited
+	 * Uses $wgOut->makeResourceLoaderLink which was protected, but has lots of logic we don't want to duplicate
+	 * This was rewritten from scratch as part of BAC-895
 	 *
 	 * @param Title $title page to be purged
 	 * @param Array $urls list of URLs to be purged
 	 * @return mixed true - it's a hook
 	 */
-	static public function onTitleGetSquidURLs(Title $title, Array $urls) {
-		// if this is a site css or js purge it as well
-		global $wgUseSiteCss, $wgAllowUserJs;
-		global $wgSquidMaxage, $wgJsMimeType;
-
+	static public function onTitleGetSquidURLs(Title $title, Array &$urls) {
+		global $wgUseSiteJs, $wgAllowUserJs, $wgUseSiteCss, $wgAllowUserCss;
+		global $wgOut;
 		wfProfileIn(__METHOD__);
 
-		if( $wgUseSiteCss && $title->getNamespace() == NS_MEDIAWIKI ) {
-			global $wgServer;
-			$urls[] = $wgServer.'/__am/';
-			$urls[] = $wgServer.'/__wikia_combined/';
-			$query = array(
-				'usemsgcache' => 'yes',
-				'ctype' => 'text/css',
-				'smaxage' => $wgSquidMaxage,
-				'action' => 'raw',
-				'maxage' => $wgSquidMaxage,
-			);
-
-			if( $title->getText() == 'Common.css' || $title->getText() == 'Wikia.css' ) {
-				// BugId:20929 - tell (or trick) varnish to store the latest revisions of Wikia.css and Common.css.
-				$oTitleCommonCss	= Title::newFromText( 'Common.css', NS_MEDIAWIKI );
-				$oTitleWikiaCss		= Title::newFromText( 'Wikia.css',  NS_MEDIAWIKI );
-				$query['maxrev'] = max( (int) $oTitleWikiaCss->getLatestRevID(), (int) $oTitleCommonCss->getLatestRevID() );
-				unset( $oTitleWikiaCss, $oTitleCommonCss );
-				$urls[] = $title->getInternalURL( $query );
-			} else {
-				foreach( Skin::getSkinNames() as $skinkey => $skinname ) {
-					if( $title->getText() == ucfirst($skinkey).'.css' ) {
-						$urls[] = str_replace('text%2Fcss', 'text/css', $title->getInternalURL( $query )); // For Artur
-						$urls[] = $title->getInternalURL( $query ); // For Artur
-						break;
-					} elseif ( $title->getText() == 'Common.js' ) {
-						$urls[] = Skin::makeUrl('-', "action=raw&smaxage=86400&gen=js&useskin=" .urlencode( $skinkey ) );
-					}
-				}
-			}
-		} elseif( $wgAllowUserJs && $title->isCssJsSubpage() ) {
-			if( $title->isJsSubpage() ) {
-				$urls[] = $title->getInternalURL( 'action=raw&ctype='.$wgJsMimeType );
-			} elseif( $title->isCssSubpage() ) {
-				$urls[] = $title->getInternalURL( 'action=raw&ctype=text/css' );
+		$link = null;
+		if( $wgUseSiteJs && $title->getNamespace() == NS_MEDIAWIKI ) {
+			if( $title->getText() == 'Common.js' || $title->getText() == 'Wikia.js') {
+				$wgOut->setAllowedModules( ResourceLoaderModule::TYPE_SCRIPTS, ResourceLoaderModule::ORIGIN_ALL );
+				$link = $wgOut->makeResourceLoaderLink( 'site', ResourceLoaderModule::TYPE_SCRIPTS );
 			}
 		}
-
-		// purge Special:RecentChanges too
-		$urls[] = SpecialPage::getTitleFor('RecentChanges')->getInternalURL();
+		if ($wgUseSiteCss && $title->getNamespace() == NS_MEDIAWIKI ) {
+			if( $title->getText() == 'Common.css' || $title->getText() == 'Wikia.css' ) {
+				$wgOut->setAllowedModules( ResourceLoaderModule::TYPE_STYLES, ResourceLoaderModule::ORIGIN_ALL );
+				$link = $wgOut->makeResourceLoaderLink( 'site', ResourceLoaderModule::TYPE_STYLES );
+			}
+		}
+		if( $wgAllowUserJs && $title->isJsSubpage() ) {
+			$wgOut->setAllowedModules( ResourceLoaderModule::TYPE_SCRIPTS, ResourceLoaderModule::ORIGIN_ALL );
+			$link = $wgOut->makeResourceLoaderLink( 'user', ResourceLoaderModule::TYPE_SCRIPTS );
+		}
+		if( $wgAllowUserCss && $title->isCssSubpage() ) {
+			$wgOut->setAllowedModules( ResourceLoaderModule::TYPE_STYLES, ResourceLoaderModule::ORIGIN_ALL );
+			$link = $wgOut->makeResourceLoaderLink( 'user', ResourceLoaderModule::TYPE_STYLES );
+		}
+		if ($link != null) {
+			// extract the url from the link src
+			preg_match("/.*\"(.*)\"/", $link, $matches);
+			if ( isset($matches[1]) ) {
+				$urls[]= $matches[1];
+			}
+		}
 
 		wfProfileOut(__METHOD__);
 		return true;
@@ -1604,13 +1620,18 @@ class Wikia {
 	 */
 	static public function onAfterInitialize($title, $article, $output, $user, WebRequest $request, $wiki) {
 		// allinone
-		global $wgResourceLoaderDebug, $wgAllInOne;
+		global $wgResourceLoaderDebug, $wgAllInOne, $wgUseSiteJs, $wgUseSiteCss, $wgAllowUserJs, $wgAllowUserCss;
 
 		$wgAllInOne = $request->getBool('allinone', $wgAllInOne) !== false;
 		if ($wgAllInOne === false) {
 			$wgResourceLoaderDebug = true;
 			wfDebug("Wikia: using resource loader debug mode\n");
 		}
+
+		$wgUseSiteJs = $request->getBool( 'usesitejs', $wgUseSiteJs ) !== false;
+		$wgUseSiteCss = $request->getBool( 'usesitecss', $wgUseSiteCss ) !== false;
+		$wgAllowUserJs = $request->getBool( 'allowuserjs', $wgAllowUserJs ) !== false;
+		$wgAllowUserCss = $request->getBool( 'allowusercss', $wgAllowUserCss ) !== false;
 
 		return true;
 	}
@@ -1890,7 +1911,7 @@ class Wikia {
 		if ( $request->getVal('title','') === '' ) {
 			$title = Title::newMainPage();
 		} else {
-			$title = Title::newFromText($request->getVal('title', 'AJAX'));
+			$title = Title::newFromText($request->getVal('title', 'AJAX'), $request->getInt('namespace', NS_MAIN));
 			if (!$title instanceof Title) {
 				$title = Title::makeTitle( NS_MAIN, 'AJAX' );
 			}
@@ -1929,21 +1950,6 @@ class Wikia {
 				array( 'target' => $title->getText() )
 			);
 		}
-		return true;
-	}
-
-	/**
-	 * Force article Last-Modified header to include modification time of app and config repos
-	 *
-	 * @param $modifiedTimes array List of components modification time
-	 * @return true
-	 */
-	public static function onOutputPageCheckLastModified( &$modifiedTimes ) {
-		global $IP, $wgWikiaConfigDirectory;
-
-		$modifiedTimes['wikia_app'] = filemtime("$IP/includes/specials/SpecialVersion.php");
-		$modifiedTimes['wikia_config'] = filemtime("$wgWikiaConfigDirectory/CommonSettings.php");
-
 		return true;
 	}
 
@@ -2079,7 +2085,7 @@ class Wikia {
 
 		if ( $disabled ) {
 			$user->setEmail( '' );
-			$user->setPassword( wfGenerateToken() . self::HEX_CHARS );
+			$user->setPassword( wfGenerateToken() . self::REQUIRED_CHARS );
 			$user->setOption( 'disabled', 1 );
 			$user->setOption( 'disabled_date', wfTimestamp( TS_DB ) );
 			$user->mToken = null;
@@ -2097,6 +2103,211 @@ class Wikia {
 		}
 		$user->invalidateCache();
 
+		return true;
+	}
+
+	/**
+	 * Register Swift file backend
+	 *
+	 * @author macbre
+	 * @param array $repo $wgLocalFileRepo
+	 * @return bool true - it's a hook
+	 */
+	static function onAfterSetupLocalFileRepo(Array &$repo) {
+		// $wgUploadPath: http://images.wikia.com/poznan/pl/images
+		// $wgFSSwiftContainer: poznan/pl
+		global $wgFSSwiftContainer, $wgFSSwiftServer, $wgEnableSwiftFileBackend, $wgUploadPath;
+
+		$path = trim( parse_url( $wgUploadPath, PHP_URL_PATH ), '/' );
+		$wgFSSwiftContainer = substr( $path, 0, -7 );
+
+		if ( !empty( $wgEnableSwiftFileBackend ) ) {
+			$repo['backend'] = 'swift-backend';
+			$repo['zones'] = array (
+				'public' => array( 'container' => $wgFSSwiftContainer, 'url' => 'http://' . $wgFSSwiftServer, 'directory' => 'images' ),
+				'temp'   => array( 'container' => $wgFSSwiftContainer, 'url' => 'http://' . $wgFSSwiftServer, 'directory' => 'images/temp' ),
+				'thumb'  => array( 'container' => $wgFSSwiftContainer, 'url' => 'http://' . $wgFSSwiftServer, 'directory' => 'images/thumb' ),
+				'deleted'=> array( 'container' => $wgFSSwiftContainer, 'url' => 'http://' . $wgFSSwiftServer, 'directory' => 'images/deleted' ),
+				'archive'=> array( 'container' => $wgFSSwiftContainer, 'url' => 'http://' . $wgFSSwiftServer, 'directory' => 'images/archive' )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Modify timeline extension to use Swift storage (BAC-893)
+	 *
+	 * @param FileBackend $backend
+	 * @param string $fname mwstore abstract path
+	 * @param string $hash file hash
+	 * @return bool true - it's a hook
+	 */
+	static function onBeforeRenderTimeline(&$backend, &$fname, $hash) {
+		global $wgEnableSwiftFileBackend, $wgFSSwiftContainer;
+
+		if ( !empty( $wgEnableSwiftFileBackend ) ) {
+			$backend = FileBackendGroup::singleton()->get( 'swift-backend' );
+			$fname = 'mwstore://' . $backend->getName() . "/$wgFSSwiftContainer/images/timeline/$hash";
+		}
+
+		return true;
+	}
+
+	/**
+	 * Rewrties favicon URL to point to CDN domain with a proper cache buster
+	 *
+	 * Uses ThemeDesigner's "revision" ID instead of wgStyleVersion
+	 * to properly update the favicon after the upload
+	 *
+	 * @param $favicon string favicon URL to modify
+	 * @return bool true
+	 *
+	 * @authro hyun
+	 * @authro macbre
+	 *
+	 * @see BAC-1131
+	 */
+	static function onOutputPageFavicon(&$favicon) {
+		$cb = SassUtil::getCacheBuster();
+		$favicon = wfReplaceImageServer($favicon, $cb);
+
+		return true;
+	}
+
+	/**
+	 * Filter-out "Tenp_file_" images from list of URLs to purge
+	 *
+	 * @param File $file image to purge
+	 * @param array $urls URLs to purge generated by MW core
+	 */
+	static function onLocalFileExecuteUrls( File $file, Array &$urls ) {
+		if ( strpos( $file->getName(), 'Temp_file_' ) === 0  && $file->getExtension() === '' ) {
+			wfDebug(__METHOD__ . ": removed {$file->getName()} from the purger queue\n");
+			$urls = [];
+		}
+
+		return true;
+	}
+
+	/**
+	 * Send ETag header with article's last modification timestamp and cache buster
+	 *
+	 * See BAC-1227 for details
+	 *
+	 * @param WikiPage $article
+	 * @param ParserOptions $popts
+	 * @param $eTag
+	 * @author macbre
+	 */
+	static function onParserCacheGetETag(Article $article, ParserOptions $popts, &$eTag) {
+		global $wgStyleVersion;
+		$touched = $article->getTouched();
+
+		// don't emit the default touched value set in WikiPage class (see CONN-430)
+		if ($touched === '19700101000000') {
+			$eTag = '';
+			return true;
+		}
+
+		$eTag = sprintf( '%s-%s', $touched, $wgStyleVersion );
+		return true;
+	}
+
+	/**
+	 * Add response headers with debug data and statistics
+	 *
+	 * @param WebResponse $response
+	 * @author macbre
+	 */
+	private static function addExtraHeaders(WebResponse $response) {
+		global $wgRequestTime;
+		$elapsed = microtime( true ) - $wgRequestTime;
+
+		$response->header( sprintf( 'X-Served-By:%s', wfHostname() ) );
+		$response->header( sprintf( 'X-Backend-Response-Time:%01.3f', $elapsed ) );
+
+		$response->header( 'X-Cache: ORIGIN' );
+		$response->header( 'X-Cache-Hits: ORIGIN' );
+	}
+
+	/**
+	 * Add X-Served-By and X-Backend-Response-Time response headers to MediaWiki pages
+	 *
+	 * See BAC-550 for details
+	 *
+	 * @param OutputPage $out
+	 * @param Skin $sk
+	 * @return bool
+	 * @author macbre
+	 */
+	static function onBeforeSendCacheControl(OutputPage $out) {
+		self::addExtraHeaders( $out->getRequest()->response() );
+		return true;
+	}
+
+	/**
+	 * Add X-Served-By and X-Backend-Response-Time response headers to ResourceLoader
+	 *
+	 * See BAC-1319 for details
+	 *
+	 * @param ResourceLoader $rl
+	 * @param ResourceLoaderContext $context
+	 * @return bool
+	 * @author macbre
+	 */
+	static function onResourceLoaderAfterRespond(ResourceLoader $rl, ResourceLoaderContext $context) {
+		self::addExtraHeaders( $context->getRequest()->response() );
+		return true;
+	}
+
+	/**
+	 * Add X-Served-By and X-Backend-Response-Time response headers to wikia.php
+	 *
+	 * @param WikiaApp $app
+	 * @param WikiaResponse $response
+	 * @return bool
+	 * @author macbre
+	 */
+	static function onNirvanaAfterRespond(WikiaApp $app, WikiaResponse $response) {
+		self::addExtraHeaders( $app->wg->Request->response() );
+		return true;
+	}
+
+	/**
+	 * Purge a limited set of language variants on Chinese wikis
+	 *
+	 * See BAC-1278 / BAC-698 for details
+	 *
+	 * @param Language $contLang
+	 * @param array $variants
+	 * @return bool
+	 * @author macbre
+	 */
+	static function onTitleGetLangVariants(Language $contLang, Array &$variants) {
+		switch($contLang->getCode()) {
+			case 'zh':
+				// skin displays links to these variants only
+				$variants = ['zh-hans', 'zh-hant'];
+				break;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Don't send purge requests for each thumbnail.
+	 * Single purge from "LocalFile:purgeCache" does the trick.
+	 *
+	 * @author macbre
+	 * @see PLATFORM-161
+	 *
+	 * @param LocalFile $file
+	 * @param array $urls thumbs to purge
+	 * @return bool
+	 */
+	static function onLocalFilePurgeThumbnailsUrls( LocalFile $file, Array &$urls ) {
+		$urls = [];
 		return true;
 	}
 }

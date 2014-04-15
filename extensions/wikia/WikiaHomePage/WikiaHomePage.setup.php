@@ -20,6 +20,7 @@ $wgExtensionCredits['other'][] = array(
 );
 
 $wgAutoloadClasses['WikiaHomePageController'] = $dir.'WikiaHomePageController.class.php';
+$wgAutoloadClasses['WikiaHubsApiController'] = $dir . '../WikiaHubsServices/api/WikiaHubsApiController.class.php';
 
 //i18n mapping
 $wgExtensionMessagesFiles['WikiaHomePage'] = $dir.'WikiaHomePage.i18n.php';
@@ -32,3 +33,5 @@ $wgHooks['WikiaMobileAssetsPackages'][] = 'WikiaHomePageController::onWikiaMobil
 $wgHooks['ArticleCommentCheck'][] = 'WikiaHomePageController::onArticleCommentCheck';
 $wgHooks['AfterGlobalHeader'][] = 'WikiaHomePageController::onAfterGlobalHeader';
 $wgHooks['GetRailModuleList'][] = 'WikiaHomePageController::onGetRailModuleList';
+$wgHooks['BeforePageDisplay'][] = 'WikiaHomePageController::onBeforePageDisplay';
+$wgHooks['AfterOasisSettingsInitialized'][] = 'WikiaHomePageController::onAfterOasisSettingsInitialized';

@@ -67,14 +67,18 @@ Check given username for possible typos.</p>',
  * @author Umherirrender
  */
 $messages['qqq'] = array(
+	'lookupcontribslinks' => '{{Identical|Contribution link}}',
 	'lookupcontribsgo' => '{{Identical|Go}}',
 	'lookupcontribswiki' => '{{Identical|Wiki}}',
+	'lookupcontribswikidbname' => '{{Identical|Database name}}',
 	'lookupcontribswikiurl' => '{{Identical|URL}}',
 	'lookupcontribswikititle' => '{{Identical|Title}}',
+	'lookupcontribscontribslink' => '{{Identical|Contribution link}}',
 	'lookupcontribsnext' => '{{Identical|Next}}',
 	'lookupcontribsprevious' => '{{Identical|Previous}}',
 	'lookupcontribspageremoved' => '{{Identical|Removed}}',
 	'lookupcontribsrestore' => '{{Identical|Restore}}',
+	'lookupcontribscontribs' => '{{Identical|Contribution}}',
 	'right-lookupcontribs' => '{{doc-right|lookupcontribs|ns=Wikia}}',
 	'lookupcontribsshowpages' => '',
 	'lookupcontribscontent' => '{{Identical|Content}}',
@@ -184,6 +188,7 @@ $messages['az'] = array(
 	'lookupcontribswikititle' => 'Başlıq',
 	'lookupcontribsnext' => 'növbəti',
 	'lookupcontribsfinal' => 'son',
+	'lookupcontribsall' => 'bütün',
 );
 
 /** Belarusian (Taraškievica orthography) (беларуская (тарашкевіца)‎)
@@ -321,15 +326,19 @@ Registre d\'entrada donat nom d\'usuari per possibles errors tipogràfics.</p>',
  */
 $messages['ce'] = array(
 	'lookupcontribs' => 'Къинхьегаме хьажа',
-	'lookupcontribslinks' => 'къинхьегаме хьажориг',
+	'lookupcontribslinks' => 'къинхьегаме хьажораг',
+	'lookupcontribsgo' => 'Дехьа гӀо',
 	'lookupcontribsnoresultfound' => 'ХӀума ца карийна!',
 	'lookupcontribswikititle' => 'ЦӀе',
 	'lookupcontribswikioptions' => 'Параметраш',
-	'lookupcontribscontribslink' => 'Къинхьегаме хьажориг',
+	'lookupcontribscontribslink' => 'Къинхьегаме хьажораг',
 	'lookupcontribscontribs' => 'къинхьегам',
+	'lookupcontribshist' => 'истори',
+	'lookupcontribscontent' => 'чулацам',
+	'lookupcontribsall' => 'массо',
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Chmee2
  * @author Mormegil
  */
@@ -548,17 +557,27 @@ $messages['es'] = array(
 
 /** Basque (euskara)
  * @author An13sa
+ * @author Subi
  */
 $messages['eu'] = array(
 	'lookupcontribswikiurl' => 'URL',
 	'lookupcontribswikititle' => 'Izenburua',
+	'lookupcontribswikioptions' => 'Aukerak',
 );
 
 /** Persian (فارسی)
  * @author BlueDevil
  * @author Ebraminio
+ * @author Reza1615
  */
 $messages['fa'] = array(
+	'lookupcontribsgo' => 'برو',
+	'lookupcontribswiki' => 'ویکی',
+	'lookupcontribswikiurl' => 'نشانی اینترنتی',
+	'lookupcontribswikititle' => 'عنوان',
+	'lookupcontribswikioptions' => 'گزینه',
+	'lookupcontribshist' => 'تاریخچه',
+	'lookupcontribsdiff' => 'تفاوت',
 	'lookupcontribscontent' => 'محتوا',
 	'lookupcontribsnormal' => 'اخیر',
 	'lookupcontribsall' => 'همه',
@@ -567,9 +586,17 @@ $messages['fa'] = array(
 /** Finnish (suomi)
  * @author Centerlink
  * @author Crt
+ * @author Elseweyr
+ * @author Konstaduck
  * @author Tofu II
  */
 $messages['fi'] = array(
+	'lookupcontribs' => 'Etsi muokkaukset',
+	'lookupcontribstitle' => 'Etsi muokkaukset',
+	'lookupcontribsrecentcontributions' => 'Käyttäjän $1 viimeaikaiset muokkaukset',
+	'lookupcontribsfinalcontributions' => 'Käyttäjän $1 viimeiset muokkaukset',
+	'lookupcontribshelp' => 'Tämän toimintosivun avulla voidaan tarkastella käyttäjän muokkauksia useissa Wikian wikeissä.
+Syötä käyttäjänimi luettelon näkemiseksi.',
 	'lookupcontribsselectuser' => 'Valitse käyttäjä:',
 	'lookupcontribsdisplaymode' => 'Näyttötila:',
 	'lookupcontribsfullurls' => 'täydelliset verkko-osoitteet',
@@ -589,6 +616,9 @@ $messages['fi'] = array(
 	'lookupcontribsprevious' => 'edellinen',
 	'lookupcontribspageremoved' => 'Poistettu:',
 	'lookupcontribsrestore' => 'palauta',
+	'lookupcontribslog' => 'loki',
+	'lookupcontribshist' => 'historia',
+	'lookupcontribsdiff' => 'ero',
 	'lookupcontribscontent' => 'sisältö',
 	'lookupcontribsnormal' => 'äskettäinen',
 	'lookupcontribsfinal' => 'lopullinen',
@@ -954,6 +984,23 @@ Vergewëssert Iech datt Dir Iech beim Benotzernumm net vertippt hutt.</p>',
 	'lookupcontribsshowpages' => 'All Säiten ($1 Nummraim)',
 	'lookupcontribscontent' => 'Inhalt',
 	'lookupcontribsall' => 'All',
+);
+
+/** لوری (لوری)
+ * @author Mogoeilor
+ */
+$messages['lrc'] = array(
+	'lookupcontribsselectfor' => 'انتخاب بيه سی:',
+	'lookupcontribsgo' => 'رو',
+	'lookupcontribswiki' => 'ويكی',
+	'lookupcontribswikidbname' => 'نوم دی بی',
+	'lookupcontribswikiurl' => 'يو آر ال',
+	'lookupcontribsnext' => 'نها',
+	'lookupcontribsprevious' => 'وادمايی',
+	'lookupcontribspageremoved' => 'ؤرداشته بیه:',
+	'lookupcontribscontent' => 'محتويات',
+	'lookupcontribsnormal' => 'تازه باو',
+	'lookupcontribsall' => 'همه',
 );
 
 /** Macedonian (македонски)
@@ -1394,7 +1441,7 @@ $messages['pms'] = array(
 $messages['ps'] = array(
 	'lookupcontribsselectuser' => 'کارن ټاکل:',
 	'lookupcontribsgo' => 'ورځه',
-	'lookupcontribsselectwikis' => 'ويکي ګانې ټاکل:',
+	'lookupcontribsselectwikis' => 'ويکي گانې ټاکل:',
 	'lookupcontribswiki' => 'ويکي',
 	'lookupcontribswikititle' => 'سرليک',
 	'lookupcontribswikioptions' => 'خوښنې',
@@ -1406,7 +1453,7 @@ $messages['ps'] = array(
 	'lookupcontribshist' => 'پېښليک',
 	'lookupcontribsdiff' => 'توپير',
 	'lookupcontribsshowpages' => 'ټول مخونه ($1 نومتشيالونه)',
-	'lookupcontribscontent' => 'منځپانګه',
+	'lookupcontribscontent' => 'منځپانگه',
 	'lookupcontribscontribtitleforuser' => 'د کارن لپاره ونډې:',
 	'lookupcontribsall' => 'ټول',
 );
@@ -1469,6 +1516,7 @@ Verifique se se enganou no nome do utilizador.</p>',
 
 /** Brazilian Portuguese (português do Brasil)
  * @author Aristóbulo
+ * @author Fitoschido
  * @author JM Pessanha
  * @author Luckas
  * @author Luckas Blade
@@ -1507,7 +1555,7 @@ Verifique se se enganou com o nome do utilizador.</p>',
 	'lookupcontribsdetails' => 'Ver detalhes de:',
 	'lookupcontribslastedited' => 'Última edição',
 	'lookupcontribsrecordspager' => "A mostrar os registos '''$1''' a '''$2''' de '''$3'''.",
-	'lookupcontribsnbrresult' => 'Nº do resultado:',
+	'lookupcontribsnbrresult' => 'N.º do resultado:',
 	'lookupcontribsnext' => 'seguintes',
 	'lookupcontribsprevious' => 'anteriores',
 	'lookupcontribspageremoved' => 'Removidas:',
@@ -1723,14 +1771,49 @@ $messages['ta'] = array(
 );
 
 /** Telugu (తెలుగు)
+ * @author Chaduvari
  * @author Veeven
  */
 $messages['te'] = array(
+	'lookupcontribsrecentcontributions' => '$1 యొక్క ఇటీవలి మార్పుచేర్పులు',
+	'lookupcontribsfinalcontributions' => '$1 యొక్క చిట్టచివరి మార్పుచేర్పులు',
+	'lookupcontribusernotspecify' => 'మీరింకా వాడుకరి ఎవరినీ సూచించలేదు',
+	'lookupcontribsselectuser' => 'వాడుకరిని ఎంచుకోండి:',
+	'lookupcontribsselectmodenormal' => 'ఆ వాడుకరి యొక్క ఇటీవలి మార్పుచేర్పులు',
+	'lookupcontribsselectmodefinal' => 'ఆ వాడుకరి యొక్క చివరి మార్పుచేర్పులు',
+	'lookupcontribsselectmodeall' => 'ఆ వాడుకరి యొక్క మార్పుచేర్పులన్నీ',
+	'lookupcontribsfullurls' => 'పూర్తి URLలు',
 	'lookupcontribsgo' => 'వెళ్ళు',
+	'lookupcontribsinvaliduser' => '<p class="error">వాడుకరి "<b>$1</b>" లేనేలేరు.
+ఇచ్చిన వాడుకరి పేరులో టైపాట్లున్నాయేమో చూడండి.</p>',
+	'lookupcontribsselectwikis' => 'వికీలను ఎంచుకోండి:',
+	'lookupcontribslistwikiainfo' => '<b>$1</b> మార్పుచేర్పులు చేసిన వ్యాసాలు గల వికీల జాబితా',
+	'lookupcontribsnoresultfound' => 'ఫలితాలేమీ దొరకలేదు!',
+	'lookupcontribsinvalidresults' => 'చెల్లని ఫలితాలు!',
 	'lookupcontribswiki' => 'వికీ',
+	'lookupcontribswikidbname' => 'DB పేరు',
+	'lookupcontribswikiurl' => 'URL',
 	'lookupcontribswikititle' => 'శీర్షిక',
 	'lookupcontribswikioptions' => 'ఎంపికలు',
-	'lookupcontribsshowpages' => 'అన్ని పేజీలు ($1 పేరుబరి)',
+	'lookupcontribsdetails' => 'దీని వివరాలు చూడండి:',
+	'lookupcontribslastedited' => 'చివరి మార్పు',
+	'lookupcontribsrecordspager' => "మొత్తం '''$3''' రికార్డులలో '''$1''' నుండి '''$2''' వరకు చూపిస్తున్నాం.",
+	'lookupcontribsnext' => 'తరువాతి',
+	'lookupcontribsprevious' => 'గత',
+	'lookupcontribspageremoved' => 'తొలిగించబడినది:',
+	'lookupcontribsrestore' => 'పునఃస్థాపించు',
+	'lookupcontribslog' => 'లాగ్',
+	'lookupcontribscontribs' => 'రచనలు',
+	'lookupcontribshist' => 'చరిత్ర',
+	'lookupcontribsdiff' => 'తేడా',
+	'right-lookupcontribs' => 'వాడుకరి యొక్క సార్వత్రిక రచనలను చూపించు',
+	'lookupcontribsshowpages' => 'అన్ని పేజీలు ($1 పేరుబరులు)',
+	'lookupcontribscontent' => 'విషయం',
+	'lookupcontribscontribtitleforuser' => 'వాడుకరి మార్పుచేర్పులు:',
+	'lookupcontribsnormal' => 'ఇటీవలి',
+	'lookupcontribsfinal' => 'తుది',
+	'lookupcontribsall' => 'అన్నీ',
+	'action-lookupcontribs' => 'వివిధ వికీల్లో వాడుకరి రచనల కోసం చూసే',
 );
 
 /** Tagalog (Tagalog)
@@ -1800,6 +1883,27 @@ $messages['tly'] = array(
 	'lookupcontribsnext' => 'думотоно шә',
 	'lookupcontribsprevious' => 'навынәни',
 	'lookupcontribsall' => 'һәммәј',
+);
+
+/** Turkish (Türkçe)
+ * @author Incelemeelemani
+ */
+$messages['tr'] = array(
+	'lookupcontribsselectuser' => 'Kullanıcı seç:',
+	'lookupcontribsselectfor' => 'Seçmek için:',
+	'lookupcontribsdisplaymode' => 'Görüntü modu:',
+	'lookupcontribsgo' => 'Git',
+	'lookupcontribsselectwikis' => 'Wikileri seç:',
+	'lookupcontribsnoresultfound' => 'Hiçbir sonuç bulunamadı!',
+	'lookupcontribsinvalidresults' => 'Geçersiz sonuçlar!',
+	'lookupcontribswiki' => 'Wiki',
+	'lookupcontribswikidbname' => 'Veritabanı adı',
+	'lookupcontribswikiurl' => 'URL',
+	'lookupcontribswikititle' => 'Başlık',
+	'lookupcontribswikioptions' => 'Seçenekler',
+	'lookupcontribscontribslink' => 'Katkılara bağlantı',
+	'lookupcontribsdetails' => 'Detayları gösterilen:',
+	'lookupcontribslastedited' => 'Son düzenleme',
 );
 
 /** Tatar (Cyrillic script) (татарча)

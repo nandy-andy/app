@@ -287,14 +287,24 @@ abstract class File {
 			$this->url = $this->repo->getZoneUrl( 'public' ) . '/' . $this->getUrlRel();
 
 			# start wikia change
-			global $wgDevelEnvironment;
-			if (!empty($wgDevelEnvironment)) {
-				$this->url = wfReplaceImageServer( $this->url, $this->getTimestamp() );
-			}
+			$this->originalUrl = $this->url;
+			$this->url = wfReplaceImageServer( $this->url, $this->getTimestamp() ); // rewrite URL in all envirnoments (BAC-939)
 			# end wikia change
 		}
 		return $this->url;
 	}
+
+	# start wikia change
+	protected $originalUrl;
+
+	public function getOriginalUrl() {
+		if ( !isset( $this->url ) ) {
+			$this->getUrl();
+		}
+
+		return $this->originalUrl;
+	}
+	# end wikia change
 
 	/**
 	 * Return a fully-qualified URL to the file.
@@ -1203,6 +1213,7 @@ abstract class File {
 	function getThumbUrl( $suffix = false ) {
 		$this->assertRepoDefined();
 		$path = $this->repo->getZoneUrl( 'thumb' ) . '/' . $this->getUrlRel();
+		$path  = wfReplaceImageServer( $path, $this->getTimestamp() ); // Wikia change (BAC-1206)
 		if ( $suffix !== false ) {
 			$path .= '/' . rawurlencode( $suffix );
 		}

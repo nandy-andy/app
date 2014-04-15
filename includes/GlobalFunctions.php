@@ -1686,6 +1686,14 @@ function wfHostname() {
 function wfReportTime() {
 	global $wgRequestTime, $wgShowHostnames;
 
+	// Wikia change - begin
+	// @author macbre - BAC-550
+	global $wgDisableReportTime;
+	if ( !empty( $wgDisableReportTime ) ) {
+		return '';
+	}
+	// Wikia change - end
+
 	$elapsed = microtime( true ) - $wgRequestTime;
 
 	return $wgShowHostnames
@@ -3523,7 +3531,6 @@ function wfSplitWikiID( $wiki ) {
  * @return DatabaseBase
  */
 function &wfGetDB( $db, $groups = array(), $wiki = false ) {
-
 	// wikia change begin -- SMW DB separation project, @author Krzysztof Krzyżaniak (eloy)
 	global $smwgUseExternalDB, $wgDBname;
 	if( $smwgUseExternalDB === true ) {
@@ -3580,6 +3587,10 @@ function &wfGetLBFactory() {
  */
 function wfFindFile( $title, $options = array() ) {
 	wfProfileIn(__METHOD__);
+
+	if ( F::app()->wg->IsGhostVideo ) {
+		return false;
+	}
 	$file = RepoGroup::singleton()->findFile( $title, $options );
 	wfProfileOut(__METHOD__);
 	return $file;
@@ -3693,6 +3704,8 @@ function wfGetNull() {
  * in maintenance scripts, to avoid causing too much lag.  Of course, this is
  * a no-op if there are no slaves.
  *
+ * Wikia note: provide external DB name in $wiki parameter to wait for external DB
+ *
  * @param $maxLag Integer (deprecated)
  * @param $wiki mixed Wiki identifier accepted by wfGetLB
  */
@@ -3701,7 +3714,8 @@ function wfWaitForSlaves( $maxLag = false, $wiki = false ) {
 	// bug 27975 - Don't try to wait for slaves if there are none
 	// Prevents permission error when getting master position
 	if ( $lb->getServerCount() > 1 ) {
-		$dbw = $lb->getConnection( DB_MASTER );
+		/* Wikia change - added array() and $wiki parameters to getConnection to be able to wait for various DBs */
+		$dbw = $lb->getConnection( DB_MASTER, array(), $wiki );
 		$pos = $dbw->getMasterPos();
 		$lb->waitForAll( $pos );
 	}

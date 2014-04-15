@@ -157,6 +157,10 @@ $wgHooks['SkinTemplateToolboxEnd'][] = 'WallHooksHelper::onBuildMonobookToolbox'
 // Hook for code that wants a beautified title and URL given the not very readable Wall/Forum title
 $wgHooks['FormatForumLinks'][] = 'WallHooksHelper::onFormatForumLinks';
 
+// Fix URLs when purging after adding a thread/post
+$wgHooks['TitleGetSquidURLs'][] = 'WallHooksHelper::onTitleGetSquidURLs';
+$wgHooks['ArticleCommentGetSquidURLs'][] = 'WallHooksHelper::onArticleCommentGetSquidURLs';
+
 JSMessages::registerPackage('Wall', array(
 	'wall-notifications',
 	'wall-notifications-reminder',
@@ -180,13 +184,12 @@ JSMessages::registerPackage('Wall', array(
 	'wall-button-to-preview-comment',
 	'wall-votes-modal-title',
 	'wall-button-done-source',
-	'wall-preview-modal-title',
-	'wall-preview-modal-button-back',
-	'wall-preview-modal-button-publish',
 	'wall-action-*',
 	'wall-message-source',
 	'wall-confirm-monobook-*',
-	'wall-preview-modal-title'
+	'preview',
+	'savearticle',
+	'back',
 ));
 
 /**

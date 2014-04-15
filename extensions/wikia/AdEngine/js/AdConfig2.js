@@ -1,125 +1,130 @@
+/*exported AdConfig2*/
 var AdConfig2 = function (
 	// regular dependencies
 	log,
 	window,
 	document,
 	Geo,
-	adLogicPageDimensions,
 	abTest,
 
+	adDecoratorPageDimensions,
+
 	// adProviders
-	adProviderAdDriver2,
-	adProviderGpt,
+	adProviderDirectGpt,
 	adProviderEvolve,
-	adProviderGamePro,
 	adProviderLater,
 	adProviderNull
 ) {
 	'use strict';
 
-	var log_group = 'AdConfig2',
-		city_lang = window.wgContentLanguage,
+	var logGroup = 'AdConfig2',
 		country = Geo.getCountryCode(),
 		defaultHighValueSlots,
 		highValueSlots,
-		dartProvider = window.wgAdDriverUseFullGpt ? adProviderGpt : adProviderAdDriver2;
+		decorators = [adDecoratorPageDimensions];
 
 	defaultHighValueSlots = {
-		'CORP_TOP_LEADERBOARD':true,
-		'CORP_TOP_RIGHT_BOXAD':true,
-		'EXIT_STITIAL_BOXAD_1':true,
-		'HOME_TOP_LEADERBOARD':true,
-		'HOME_TOP_RIGHT_BOXAD':true,
-		'HUB_TOP_LEADERBOARD':true,
-		'INVISIBLE_SKIN':true,
-		'LEFT_SKYSCRAPER_2':true,
-		'MIDDLE_RIGHT_BOXAD':true,
-		'MODAL_RECTANGLE':true,
-		'MODAL_INTERSTITIAL':true,
-		'MODAL_INTERSTITIAL_1':true,
-		'MODAL_INTERSTITIAL_2':true,
-		'MODAL_INTERSTITIAL_3':true,
-		'MODAL_INTERSTITIAL_4':true,
-		'TEST_HOME_TOP_RIGHT_BOXAD':true,
-		'TEST_TOP_RIGHT_BOXAD':true,
-		'TOP_LEADERBOARD':true,
-		'TOP_RIGHT_BOXAD':true,
-		'WIKIA_BAR_BOXAD_1':true,
-		'GPT_FLUSH':true
+		'CORP_TOP_LEADERBOARD': true,
+		'CORP_TOP_RIGHT_BOXAD': true,
+		'EXIT_STITIAL_BOXAD_1': true,
+		'HOME_TOP_LEADERBOARD': true,
+		'HOME_TOP_RIGHT_BOXAD': true,
+		'HUB_TOP_LEADERBOARD': true,
+		'INVISIBLE_SKIN': true,
+		'LEFT_SKYSCRAPER_2': true,
+		'MIDDLE_RIGHT_BOXAD': true,
+		'MODAL_RECTANGLE': true,
+		'MODAL_INTERSTITIAL': true,
+		'MODAL_INTERSTITIAL_1': true,
+		'MODAL_INTERSTITIAL_2': true,
+		'MODAL_INTERSTITIAL_3': true,
+		'MODAL_INTERSTITIAL_4': true,
+		'TEST_HOME_TOP_RIGHT_BOXAD': true,
+		'TEST_TOP_RIGHT_BOXAD': true,
+		'TOP_LEADERBOARD': true,
+		'TOP_RIGHT_BOXAD': true,
+		'WIKIA_BAR_BOXAD_1': true,
+		'GPT_FLUSH': true
 	};
 
 	highValueSlots = defaultHighValueSlots;
 
-	function getBackEndProvider(slot) {
+	function getProvider(slot) {
 		var slotname = slot[0];
 
-		log('getProvider', 5, log_group);
-		log(slot, 5, log_group);
+		log(['getProvider', slot], 'info', logGroup);
 
-		// Force providers:
-		if (slot[2] === 'GamePro') {
-			return adProviderGamePro;
-		}
-		if (slot[2] === 'Evolve') {
-			return adProviderEvolve;
-		}
-		if (slot[2] === 'AdDriver2') {
-			return dartProvider;
-		}
-		if (slot[2] === 'AdDriver') {
-			return dartProvider;
-		}
-		if (slot[2] === 'Liftium2') {
-			return adProviderLater;
-		}
-		if (slot[2] === 'Liftium2Dom') {
-			return adProviderLater;
-		}
-
-		if (abTest && abTest.inGroup('PERFORMANCE_V_PREFOOTERS', 'PREFOOTERS_DISABLED')
-			&& (slotname === 'PREFOOTER_LEFT_BOXAD' || slotname === 'PREFOOTER_RIGHT_BOXAD')
-		) {
-			log('AB experiment PERFORMANCE_V_PREFOOTERS, group PREFOOTERS_DISABLED: ' + slotname + ' disabled', 5, log_group);
+		// If wgShowAds set to false, hide slots
+		if (!window.wgShowAds) {
 			return adProviderNull;
 		}
 
-		// TODO refactor highValueSlots check to the top of the whole config
-		if (highValueSlots[slotname]) {
-			// First ask GamePro (german lang wiki)
-			if (city_lang === 'de') {
-				if (adProviderGamePro.canHandleSlot(slot)) {
-					return adProviderGamePro;
-				}
-			}
+		// Force providers:
+		if (slot[2] === 'Evolve') {
+			log(['getProvider', slot, 'Evolve'], 'info', logGroup);
+			return adProviderEvolve;
+		}
+		if (slot[2] === 'AdDriver2') {
+			log(['getProvider', slot, 'Gpt'], 'info', logGroup);
+			return adProviderDirectGpt;
+		}
+		if (slot[2] === 'AdDriver') {
+			log(['getProvider', slot, 'Gpt'], 'info', logGroup);
+			return adProviderDirectGpt;
+		}
+		if (slot[2] === 'Liftium') {
+			log(['getProvider', slot, 'Later (Liftium)'], 'info', logGroup);
+			return adProviderLater;
+		}
+
+
+		// Force Liftium
+		if (window.wgAdDriverForceLiftiumAd) {
+			log(['getProvider', slot, 'Later (wgAdDriverForceLiftiumAd)'], 'info', logGroup);
+			return adProviderLater;
+		}
+
+		// Force DirectGpt
+		if (window.wgAdDriverForceDirectGptAd && adProviderDirectGpt.canHandleSlot(slotname)) {
+			log(['getProvider', slot, 'DirectGpt (wgAdDriverForceDirectGptAd)'], 'info', logGroup);
+			return adProviderDirectGpt;
+		}
+
+
+		// All SevenOne Media ads are handled in the Later queue
+		// SevenOne Media gets all but WIKIA_BAR_BOXAD_1 and TOP_BUTTON
+		// TOP_BUTTON is always handled in Later queue, so we need to exclude
+		// only WIKIA_BAR_BOXAD_1.
+		// Also we need to add an exception for GPT_FLUSH, so that WIKIA_BAR_BOXAD_1
+		// is actually requested.
+		if (window.wgAdDriverUseSevenOneMedia &&
+				slotname !== 'WIKIA_BAR_BOXAD_1' &&
+				slotname !== 'GPT_FLUSH'
+				) {
+			log(['getProvider', slot, 'Later (SevenOneMedia)'], 'info', logGroup);
+			return adProviderLater;
 		}
 
 		// Next Evolve (AU, CA, and NZ traffic)
 		if (country === 'AU' || country === 'CA' || country === 'NZ') {
-			if (adProviderEvolve.canHandleSlot(slot)) {
+			if (adProviderEvolve.canHandleSlot(slotname)) {
+				log(['getProvider', slot, 'Evolve'], 'info', logGroup);
 				return adProviderEvolve;
 			}
 		}
 
-		// Non-high-value slots goes to ad provider Later, so GamePro can grab them later
-		if (highValueSlots[slotname] && dartProvider.canHandleSlot(slot)) {
-			return dartProvider;
+		if (highValueSlots[slotname] && adProviderDirectGpt.canHandleSlot(slotname)) {
+			log(['getProvider', slot, 'Gpt'], 'info', logGroup);
+			return adProviderDirectGpt;
 		}
 
+		// Non-high-value slots go to ad provider Later
+		log(['getProvider', slot, 'Later (Liftium)'], 'info', logGroup);
 		return adProviderLater;
 	}
 
-	function getProvider(slot) {
-		var provider = getBackEndProvider(slot);
-
-		// Check if we should apply page length checking for that slot
-		if (adLogicPageDimensions.isApplicable(slot)) {
-			return adLogicPageDimensions.getProxy(provider);
-		}
-
-		return provider;
-	}
-
 	return {
+		getDecorators: function () { return decorators; },
 		getProvider: getProvider
 	};
 };

@@ -45,7 +45,7 @@ class SpecialVideosSpecialController extends WikiaSpecialPageController {
 
 		$descriptionKey = 'specialvideos-meta-description';
 
-		switch ($catInfo->cat_id) {
+		switch ( $catInfo->cat_id ) {
 			case WikiFactoryHub::CATEGORY_ID_GAMING:
 				$descriptionKey .= '-gaming';
 				break;
@@ -65,11 +65,12 @@ class SpecialVideosSpecialController extends WikiaSpecialPageController {
 		// Sorting/filtering dropdown values
 		$sort = $this->request->getVal( 'sort', 'trend' );
 		$page = $this->request->getVal( 'page', 1 );
+		$category = $this->request->getVal( 'category' );
 
 		// Add GlobalNotification message after adding a new video. We can abstract this later if we want to add more types of messages
 		$msg = $this->request->getVal( 'msg', '');
 
-		if( !empty( $msg ) ) {
+		if ( !empty( $msg ) ) {
 			$msgTitle = $this->request->getVal( 'msgTitle', '');
 			$msgTitle = urldecode($msgTitle);
 
@@ -83,12 +84,19 @@ class SpecialVideosSpecialController extends WikiaSpecialPageController {
 		// Variable to display the "add video" link at the end of the results
 		$addVideo = 1;
 
+		// Filter on a comma separated list of providers if given.
+		$providers = $this->request->getVal('provider', '');
+		// Turn this into an array of providers if this parameters is set
+		$providers = $providers ? explode(',', $providers) : null;
+
 		$specialVideos = new SpecialVideosHelper();
-		$videos = $specialVideos->getVideos( $sort, $page );
+		$videos = $specialVideos->getVideos( $sort, $page, $providers, $category );
 
 		$mediaService = new MediaQueryService();
 		if ( $sort == 'premium' ) {
 			$totalVideos = $mediaService->getTotalPremiumVideos();
+		} elseif ( $category ) {
+			$totalVideos = $mediaService->getTotalVideosByCategory( $category );
 		} else {
 			$totalVideos = $mediaService->getTotalVideos();
 		}
@@ -103,11 +111,12 @@ class SpecialVideosSpecialController extends WikiaSpecialPageController {
 		// Set up pagination
 		$pagination = '';
 		$linkToSpecialPage = SpecialPage::getTitleFor("Videos")->escapeLocalUrl();
-		if( $totalVideos > SpecialVideosHelper::VIDEOS_PER_PAGE ) {
+		if ( $totalVideos > SpecialVideosHelper::VIDEOS_PER_PAGE ) {
 			$pages = Paginator::newFromArray( array_fill( 0, $totalVideos, '' ), SpecialVideosHelper::VIDEOS_PER_PAGE );
 			$pages->setActivePage( $page - 1 );
 
-			$pagination = $pages->getBarHTML( $linkToSpecialPage.'?page=%s&sort='.$sort );
+			$categoryPagination = $category ? "&category=$category" : "";
+			$pagination = $pages->getBarHTML( $linkToSpecialPage.'?page=%s&sort='.$sort.$categoryPagination );
 			// check if we're on the last page
 			if ( $page < $pages->getPagesCount() ) {
 				// we're not so don't show the add video placeholder
@@ -118,15 +127,18 @@ class SpecialVideosSpecialController extends WikiaSpecialPageController {
 		foreach ( $videos as &$video ) {
 			$video['byUserMsg'] = $specialVideos->getByUserMsg( $video['userName'], $video['userUrl'] );
 			$video['postedInMsg'] = $specialVideos->getPostedInMsg( $video['truncatedList'], $video['isTruncated'] );
-			$video['videoOverlay'] = WikiaFileHelper::videoInfoOverlay( SpecialVideosHelper::THUMBNAIL_WIDTH, $video['fileTitle'] );
+			$video['videoOverlay'] = WikiaFileHelper::videoInfoOverlay( SpecialVideosHelper::THUMBNAIL_WIDTH, $video['fileTitle'], true );
 			$video['videoPlayButton'] = WikiaFileHelper::videoPlayButtonOverlay( SpecialVideosHelper::THUMBNAIL_WIDTH, SpecialVideosHelper::THUMBNAIL_HEIGHT );
 		}
+
+		// The new trending in <category> options have a slightly different key format
+		$sortKey = $sort.( empty($category) ? '' : ":$category" );
 
 		$this->thumbHeight = SpecialVideosHelper::THUMBNAIL_HEIGHT;
 		$this->thumbWidth = SpecialVideosHelper::THUMBNAIL_WIDTH;
 		$this->addVideo = $addVideo;
 		$this->pagination = $pagination;
-		$this->sortMsg = $sortingOptions[$sort]; // selected sorting option to display in drop down
+		$this->sortMsg = $sortingOptions[$sortKey]; // selected sorting option to display in drop down
 		$this->sortingOptions = $sortingOptions; // populate the drop down
 		$this->videos = $videos;
 

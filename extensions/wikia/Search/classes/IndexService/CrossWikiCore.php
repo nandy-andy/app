@@ -17,7 +17,7 @@ class CrossWikiCore extends AbstractWikiService
 	 * Reusing the current wiki ID
 	 * @var int
 	 */
-	protected $wikId;
+	protected $wikiId;
 	
 	/**
 	 * Returns the field values for this wiki document
@@ -25,7 +25,6 @@ class CrossWikiCore extends AbstractWikiService
 	 * @see \Wikia\Search\IndexService\AbstractService::execute()
 	 */
 	public function execute() {
-		
 		return array_merge(
 				$this->getWikiBasics(),
 				$this->getWikiStats(),
@@ -61,6 +60,7 @@ class CrossWikiCore extends AbstractWikiService
 		$response['hostname_s'] = $service->getHostName();
 		$response['hostname_txt'] = $response['hostname_s'];
 		$response['domains_txt'] = $service->getDomainsForWikiId( $this->wikiId );
+		$response['wiki_pagetitle_txt'] = str_replace( '$1 - ', '', ( \wfMessage( 'Pagetitle' )->text() ) );
 		return $response;
 	}
 	
@@ -200,12 +200,9 @@ class CrossWikiCore extends AbstractWikiService
 	protected function getLicenseInformation( ) {
 
 		$licensedWikiService = $this->getLicensedWikisService();
-
-		if( $licensedWikiService->isCommercialUseAllowedById( $this->getWikiId() ) ) {
-			return [
-				"commercial_use_allowed_b" =>  false,
-			];
-		} else { return []; }
+		return [
+			"commercial_use_allowed_b" =>  $licensedWikiService->isCommercialUseAllowedById( $this->getWikiId() ) === true
+		];
 	}
 	
 	/**

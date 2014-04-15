@@ -24,21 +24,21 @@ EOT;
 
 		return array(
 			'html' => $html,
+			'width' => $width,
+			'height' => $height,
 			'jsParams' => array(
-				'playerId'=> $playerId,
-				'videoId'=> $this->videoId,
-				'width'=> $width,
-				'height'=> $height,
-				'autoPlay'=> $autoPlayStr,
-				'title'=> $this->title,
+				'playerId' => $playerId,
+				'videoId' => $this->videoId,
+				'autoPlay' => $autoPlayStr,
+				'title' => $this->title,
 				'jsFile' => array(
 					$jsFile,
-					"extensions/wikia/VideoHandlers/js/handlers/OoyalaModule.js",
+					"extensions/wikia/VideoHandlers/js/handlers/lib/OoyalaAgeGate.js",
 				),
 			),
 			'init' => 'wikia.videohandler.ooyala',
 			'scripts' => array(
-				"extensions/wikia/VideoHandlers/js/handlers/Ooyala.js"
+				"extensions/wikia/VideoHandlers/js/handlers/Ooyala.js",
 			),
 		);
 	}

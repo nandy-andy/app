@@ -155,21 +155,21 @@ class OoyalaApiWrapper extends ApiWrapper {
 	protected function loadMetadata( array $overrideFields = array() ) {
 		parent::loadMetadata( $overrideFields );
 
-		$metadata = array();
-		if ( !isset( $metadata['source'] ) ) {
-			$metadata['source'] = $this->getSource();
+		if ( !isset( $this->metadata['source'] ) ) {
+			$this->metadata['source'] = $this->getSource();
 		}
-		if ( !isset( $metadata['sourceId'] ) ) {
-			$metadata['sourceId'] = $this->getSourceId();
+		if ( !isset( $this->metadata['sourceId'] ) ) {
+			$this->metadata['sourceId'] = $this->getSourceId();
 		}
-		if ( !isset($metadata['startDate'] ) ) {
-			$metadata['startDate'] = $this->getVideoStartDate();
+		if ( !isset( $this->metadata['startDate'] ) ) {
+			$this->metadata['startDate'] = $this->getVideoStartDate();
 		}
-		if ( !isset( $metadata['pageCategories'] ) ) {
-			$metadata['pageCategories'] = $this->getPageCategories();
+		if ( !isset( $this->metadata['distributor'] ) ) {
+			$this->metadata['distributor'] = $this->getDistributor();
 		}
-
-		$this->metadata = array_merge( $this->metadata, $metadata );
+		if ( !isset( $this->metadata['pageCategories'] ) ) {
+			$this->metadata['pageCategories'] = $this->getPageCategories();
+		}
 	}
 
 	protected function getOriginalDescription() {
@@ -535,6 +535,22 @@ class OoyalaApiWrapper extends ApiWrapper {
 
 		if ( !empty( $this->interfaceObj['metadata']['name'] ) ) {
 			return $this->interfaceObj['metadata']['name'];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get distributor
+	 * @return string
+	 */
+	protected function getDistributor() {
+		if ( !empty( $this->metadata['distributor'] ) ) {
+			return $this->metadata['distributor'];
+		}
+
+		if ( !empty( $this->interfaceObj['metadata']['distributor'] ) ) {
+			return $this->interfaceObj['metadata']['distributor'];
 		}
 
 		return '';

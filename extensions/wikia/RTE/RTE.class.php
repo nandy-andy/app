@@ -393,8 +393,12 @@ HTML
 		}
 
 		// check user preferences option
-		$userOption = $wgUser->getOption('enablerichtext');
-		if( ($userOption != true) && empty($forcedWysiwyg) ) {
+		/* With the new editor option available from the EditorPreference extension,
+		   the 'enablerichtext' option should no longer influence availability of the RTE.
+		   See Wikia issue VE-742 for more information. If editor is set to the Source
+		   editor, disable the RTE/CK editor.
+		 */
+		if ( $wgUser->getOption( PREFERENCE_EDITOR ) == EditorPreference::OPTION_EDITOR_SOURCE && empty( $forcedWysiwyg ) ) {
 			RTE::log('editor is disabled because of user preferences');
 			self::disableEditor('userpreferences');
 		}
@@ -700,14 +704,6 @@ HTML
 		// add JS to hide certain switches when wysiwyg is enabled
 		global $wgOut, $wgJsMimeType, $wgExtensionsPath;
 		$wgOut->addScript( "<script type=\"{$wgJsMimeType}\" src=\"$wgExtensionsPath/wikia/RTE/js/RTE.preferences.js\"></script>" );
-
-		// add RTE related section under "Editing" tab
-		$preferences['enablerichtext'] = array(
-			'type' => 'toggle',
-			'section' => 'editing/rte',
-			'label-message' => 'enablerichtexteditor',
-		);
-
 		return true;
 	}
 
@@ -778,6 +774,12 @@ HTML
 
 		if ( strpos($sAgent, 'Mobile') !== false && strpos($sAgent, 'Safari') !== false ) {
 			// disable for mobile devices from Apple (RT #38829)
+			$ret = false;
+		}
+
+		// Disable for IE 11 (VE-675). RTE should be gone by the time IE 12 rolls out, so it's
+		// not necessary to match for future versions.
+		if ( strpos( $sAgent, 'Trident/' ) !== false && strpos( $sAgent, 'rv:11.0' ) !== false ) {
 			$ret = false;
 		}
 

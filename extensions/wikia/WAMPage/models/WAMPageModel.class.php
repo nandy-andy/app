@@ -15,7 +15,7 @@ class WAMPageModel extends WikiaModel {
 
 	/**
 	 * @desc Cache for config array from WikiFactory
-	 * 
+	 *
 	 * @var mixed|null
 	 */
 	protected $config = null;
@@ -26,13 +26,13 @@ class WAMPageModel extends WikiaModel {
 	 * @var null
 	 */
 	protected $pagesMap = null;
-	
+
 	static protected $failoverTabsNames = [
-		self::TAB_INDEX_TOP_WIKIS => 'Top wikis',
+		self::TAB_INDEX_TOP_WIKIS => 'Top wikias',
 		self::TAB_INDEX_BIGGEST_GAINERS => 'The biggest gainers',
-		self::TAB_INDEX_GAMING => 'Top video games wikis',
-		self::TAB_INDEX_ENTERTAINMENT => 'Top entertainment wikis',
-		self::TAB_INDEX_LIFESTYLE => 'Top lifestyle wikis'
+		self::TAB_INDEX_GAMING => 'Top video games wikias',
+		self::TAB_INDEX_ENTERTAINMENT => 'Top entertainment wikias',
+		self::TAB_INDEX_LIFESTYLE => 'Top lifestyle wikias'
 	];
 
 	static protected $verticalIds = [
@@ -40,7 +40,7 @@ class WAMPageModel extends WikiaModel {
 		WikiFactoryHub::CATEGORY_ID_ENTERTAINMENT,
 		WikiFactoryHub::CATEGORY_ID_LIFESTYLE
 	];
-	
+
 	public function __construct() {
 		parent::__construct();
 
@@ -48,7 +48,7 @@ class WAMPageModel extends WikiaModel {
 			$this->config = $this->app->wg->WAMPageConfig;
 		}
 	}
-	
+
 	public function getConfig() {
 		return $this->config;
 	}
@@ -60,7 +60,7 @@ class WAMPageModel extends WikiaModel {
 	public function getVisualizationItemsCount() {
 		return self::VISUALIZATION_ITEMS_COUNT;
 	}
-	
+
 	public function getFirstPage() {
 		return self::FIRST_PAGE;
 	}
@@ -101,7 +101,7 @@ class WAMPageModel extends WikiaModel {
 	 */
 	public function getIndexWikis($params) {
 		$params = $this->getIndexParams($params);
-		
+
 		if( !empty($this->app->wg->DevelEnvironment) ) {
 			$WAMData = $this->getMockedDataForDev();
 		} else {
@@ -109,7 +109,6 @@ class WAMPageModel extends WikiaModel {
 		}
 
 		$WAMData['wam_index'] = $this->prepareIndex($WAMData['wam_index'], self::TAB_INDEX_TOP_WIKIS);
-		$WAMData['wam_index'] = $this->calculateFilterIndex($WAMData['wam_index'], $params);
 
 		return $WAMData;
 	}
@@ -131,24 +130,24 @@ class WAMPageModel extends WikiaModel {
 		}
 		return $dates;
 	}
-	
+
 	public function getWAMMainPageName() {
 		$config = $this->getConfig();
 		return $config['pageName'];
 	}
-	
+
 	public function getWAMMainPageUrl($filterParams = array()) {
 		$title = $this->getTitleFromText($this->getWAMMainPageName());
-		
+
 		return ($title instanceof Title) ? $title->getFullUrl().$this->getParamsAsQuery($filterParams) : null;
 	}
 
 	/**
 	 * @desc Checks if given title is a WAM page/subpage and if it is returns its url
-	 * 
+	 *
 	 * @param Title $title instance of class Title
 	 * @param bool $fullUrl flag which informs method to return full url by default or local url when false passed
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getWAMSubpageUrl(Title $title, $fullUrl = true) {
@@ -156,14 +155,14 @@ class WAMPageModel extends WikiaModel {
 			$dbkeysMap = $this->getWamPagesDbKeysMap();
 			$dbkeyLower = mb_strtolower($title->getDBKey());
 			$wamPageDbkey = isset($dbkeysMap[$dbkeyLower]) ? $dbkeysMap[$dbkeyLower] : false;
-			
+
 			if( $wamPageDbkey ) {
 				$title = $this->getTitleFromText($wamPageDbkey);
 			}
 		}
-		
+
 		$url = ($fullUrl) ? $title->getFullUrl() : $title->getLocalURL();
-		
+
 		return $url;
 	}
 
@@ -171,16 +170,16 @@ class WAMPageModel extends WikiaModel {
 		$config = $this->getConfig();
 		return $config['faqPageName'];
 	}
-	
+
 	public function isWAMFAQPage(Title $title) {
 		return mb_strtolower($title->getText()) === mb_strtolower($this->getWAMFAQPageName());
 	}
-	
+
 	public function getTabsNamesArray() {
 		$config = $this->getConfig();
 		return !empty($config['tabsNames']) ? $config['tabsNames'] : $this->getDefaultTabsNames();
 	}
-	
+
 	public function getTabIndexBySubpageText($subpageText) {
 		return array_search($subpageText, $this->getTabsNamesArray());
 	}
@@ -201,7 +200,7 @@ class WAMPageModel extends WikiaModel {
 	public function getSubpageTextByIndex($tabIndex, $defaultTitle) {
 		$tabs = $this->getTabs();
 		$tabIndex = (int)$tabIndex; // first tab has 'false' as tabIndex
-		
+
 		// we don't have that index - return default title
 		return isset($tabs[$tabIndex]['name']) ? $tabs[$tabIndex]['name'] : $defaultTitle;
 	}
@@ -217,7 +216,7 @@ class WAMPageModel extends WikiaModel {
 		$pageName = $this->getWAMMainPageName();
 		$tabsNames = $this->getTabsNamesArray();
 		$filterParamsQueryString = $this->getParamsAsQuery($filterParams);
-		
+
 		foreach($tabsNames as $tabName) {
 			$tabTitle = $this->getTitleFromText($pageName . '/'. $tabName);
 			$tabUrl = $tabTitle->getLocalURL() . $filterParamsQueryString;
@@ -230,7 +229,7 @@ class WAMPageModel extends WikiaModel {
 
 		return $tabs;
 	}
-	
+
 	public function getWamPagesDbKeysMap() {
 		if( is_null($this->pagesMap) ) {
 			$this->pagesMap = [];
@@ -271,7 +270,7 @@ class WAMPageModel extends WikiaModel {
 		}
 		return $verticals;
 	}
-	
+
 	protected function getDefaultTabsNames() {
 		return self::$failoverTabsNames;
 	}
@@ -285,14 +284,6 @@ class WAMPageModel extends WikiaModel {
 			$wiki['hub_name'] = $this->getVerticalName($wiki['hub_id']);
 		}
 
-		return $wamWikis;
-	}
-
-	protected function calculateFilterIndex($wamWikis, $params) {
-		$i = 1;
-		foreach ($wamWikis as &$wiki) {
-			$wiki['index'] = $params['offset'] + $i++;
-		}
 		return $wamWikis;
 	}
 
@@ -350,7 +341,7 @@ class WAMPageModel extends WikiaModel {
 		$firstPageNo = $this->getFirstPage();
 		$page = !empty($params['page']) ? intval($params['page']) : $firstPageNo;
 		$offset = ($page > $firstPageNo) ? (($page - 1) * $itemsPerPage) : 0;
-		
+
 		$apiParams = [
 			'avatar_size' => 21,
 			'fetch_admins' => true,
@@ -369,7 +360,7 @@ class WAMPageModel extends WikiaModel {
 
 	/**
 	 * Convert filter params to query params ready to be concatenated.
-	 * 
+	 *
 	 * @param $filterParams - filter params passed from controller
 	 *
 	 * @return string
@@ -386,6 +377,12 @@ class WAMPageModel extends WikiaModel {
 		return count($queryParams) ? '?'.http_build_query($queryParams) : '';
 	}
 
+	/**
+	 * Check if title is WAM page or subPage
+	 *
+	 * @param $title
+	 * @return bool
+	 */
 	public function isWAMPage($title) {
 		wfProfileIn(__METHOD__);
 		$dbKey = null;
@@ -393,7 +390,7 @@ class WAMPageModel extends WikiaModel {
 		if( $title instanceof Title ) {
 			$dbKey = mb_strtolower( $title->getDBKey() );
 		}
-		
+
 		wfProfileOut(__METHOD__);
 		return in_array($dbKey, array_keys($this->getWamPagesDbKeysMap()));
 	}
@@ -401,7 +398,7 @@ class WAMPageModel extends WikiaModel {
 	/**
 	 * MOCKED data for devboxes for testing
 	 * because we don't have wam data on devboxes
-	 * 
+	 *
 	 * @return array
 	 */
 	protected function getMockedDataForDev() {
@@ -555,7 +552,7 @@ class WAMPageModel extends WikiaModel {
 			],
 		]];
 	}
-	
+
 	protected function getTitleFromText($text) {
 		return Title::newFromText($text);
 	}

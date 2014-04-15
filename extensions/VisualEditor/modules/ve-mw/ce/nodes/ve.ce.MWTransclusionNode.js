@@ -15,11 +15,12 @@
  * @extends ve.ce.LeafNode
  * @mixins ve.ce.ProtectedNode
  * @mixins ve.ce.FocusableNode
+ * @mixins ve.ce.RelocatableNode
  * @mixins ve.ce.GeneratedContentNode
  *
  * @constructor
  * @param {ve.dm.MWTransclusionNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.MWTransclusionNode = function VeCeMWTransclusionNode( model, config ) {
 	// Parent constructor
@@ -28,21 +29,24 @@ ve.ce.MWTransclusionNode = function VeCeMWTransclusionNode( model, config ) {
 	// Mixin constructors
 	ve.ce.ProtectedNode.call( this );
 	ve.ce.FocusableNode.call( this );
+	ve.ce.RelocatableNode.call( this );
 	ve.ce.GeneratedContentNode.call( this );
 
 	// DOM changes
-	this.$.addClass( 've-ce-mwTransclusionNode' );
+	this.$element.addClass( 've-ce-mwTransclusionNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWTransclusionNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.MWTransclusionNode, ve.ce.LeafNode );
 
-ve.mixinClass( ve.ce.MWTransclusionNode, ve.ce.ProtectedNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.ProtectedNode );
 
-ve.mixinClass( ve.ce.MWTransclusionNode, ve.ce.FocusableNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.FocusableNode );
 
-ve.mixinClass( ve.ce.MWTransclusionNode, ve.ce.GeneratedContentNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.RelocatableNode );
+
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.GeneratedContentNode );
 
 /* Static Properties */
 
@@ -54,7 +58,7 @@ ve.ce.MWTransclusionNode.static.renderHtmlAttributes = false;
 
 /** */
 ve.ce.MWTransclusionNode.prototype.generateContents = function ( config ) {
-	var xhr, promise, deferred = $.Deferred();
+	var xhr, deferred = $.Deferred();
 	xhr = $.ajax( {
 		'url': mw.util.wikiScript( 'api' ),
 		'data': {
@@ -69,15 +73,12 @@ ve.ce.MWTransclusionNode.prototype.generateContents = function ( config ) {
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
 		'timeout': 100000,
-		'cache': 'false',
-		'success': ve.bind( this.onParseSuccess, this, deferred ),
-		'error': ve.bind( this.onParseError, this, deferred )
-	} );
-	promise = deferred.promise();
-	promise.abort = function () {
-		xhr.abort();
-	};
-	return promise;
+		'cache': 'false'
+	} )
+		.done( ve.bind( this.onParseSuccess, this, deferred ) )
+		.fail( ve.bind( this.onParseError, this, deferred ) );
+
+	return deferred.promise( { abort: xhr.abort} );
 };
 
 /**
@@ -87,18 +88,31 @@ ve.ce.MWTransclusionNode.prototype.generateContents = function ( config ) {
  * @param {Object} response Response data
  */
 ve.ce.MWTransclusionNode.prototype.onParseSuccess = function ( deferred, response ) {
-	var contentNodes;
+	var contentNodes, $placeHolder;
 
 	if ( !response || response.error || !response.visualeditor || response.visualeditor.result !== 'success' ) {
 		return this.onParseError.call( this, deferred );
 	}
 
-	contentNodes = $( response.visualeditor.content ).get();
+	contentNodes = this.$( response.visualeditor.content ).get();
 	// HACK: if $content consists of a single paragraph, unwrap it.
 	// We have to do this because the PHP parser wraps everything in <p>s, and inline templates
 	// will render strangely when wrapped in <p>s.
 	if ( contentNodes.length === 1 && contentNodes[0].nodeName.toLowerCase() === 'p' ) {
 		contentNodes = Array.prototype.slice.apply( contentNodes[0].childNodes );
+	}
+
+	// Check if the final result of the imported template is empty.
+	// If it is empty, put an inline placeholder inside it so that it can
+	// be accessible to users (either to remove or edit)
+	if ( contentNodes.length === 0 ) {
+		$placeHolder = this.$( '<span>' )
+			.css( { 'display': 'block' } )
+			// adapted from ve.ce.BranchNode.$blockSlugTemplate
+			// IE support may require using &nbsp;
+			.html( '&#xFEFF;' );
+
+		contentNodes.push( $placeHolder[0] );
 	}
 	deferred.resolve( contentNodes );
 };
@@ -128,12 +142,12 @@ ve.ce.MWTransclusionBlockNode = function VeCeMWTransclusionBlockNode( model ) {
 	ve.ce.MWTransclusionNode.call( this, model );
 
 	// DOM changes
-	this.$.addClass( 've-ce-mwTransclusionBlockNode' );
+	this.$element.addClass( 've-ce-mwTransclusionBlockNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWTransclusionBlockNode, ve.ce.MWTransclusionNode );
+OO.inheritClass( ve.ce.MWTransclusionBlockNode, ve.ce.MWTransclusionNode );
 
 /* Static Properties */
 
@@ -154,12 +168,12 @@ ve.ce.MWTransclusionInlineNode = function VeCeMWTransclusionInlineNode( model ) 
 	ve.ce.MWTransclusionNode.call( this, model );
 
 	// DOM changes
-	this.$.addClass( 've-ce-mwTransclusionInlineNode' );
+	this.$element.addClass( 've-ce-mwTransclusionInlineNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWTransclusionInlineNode, ve.ce.MWTransclusionNode );
+OO.inheritClass( ve.ce.MWTransclusionInlineNode, ve.ce.MWTransclusionNode );
 
 /* Static Properties */
 

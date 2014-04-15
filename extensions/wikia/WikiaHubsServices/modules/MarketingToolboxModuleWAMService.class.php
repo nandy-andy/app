@@ -48,10 +48,9 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 	}
 
 	public function loadData($model, $params) {
+		$hubParams = $this->getHubsParams();
 		$lastTimestamp = $model->getLastPublishedTimestamp(
-									$this->langCode,
-									$this->sectionId,
-									$this->verticalId,
+									$hubParams,
 									$params['ts']
 						);
 
@@ -130,8 +129,8 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 						'admins' => [],
 						'wiki_image' => null,
 					],
-					3125 => [
-						'wiki_id' => '3125',
+				113 => [
+						'wiki_id' => '113',
 						'wam'=> '99.5000',
 						'wam_rank' => '17',
 						'hub_wam_rank' => '5',
@@ -141,8 +140,8 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 						'top_1k_weeks' => '62',
 						'first_peak' => '2012-05-04',
 						'last_peak' => '2013-05-07',
-						'title' => 'Call of Duty Wiki',
-						'url' => 'callofduty.wikia.com',
+						'title' => 'Memmory Alpha Wiki',
+						'url' => 'en.memory-alpha.org',
 						'hub_id' => '2',
 						'wam_change' => '-0.1000',
 						'admins' => [],
@@ -164,17 +163,32 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 					$this->skinName
 				),
 				6 * 60 * 60,
-				function () use( $params ) {
-					return $this->loadStructuredData($params);
+				function () use( $model, $params ) {
+					return $this->loadStructuredData($model, $params);
 				}
 			);
+		}
+
+		if ( $this->getShouldFilterCommercialData() ) {
+			$structuredData = $this->filterCommercialData( $structuredData );
 		}
 
 		return $structuredData;
 	}
 
-	protected function loadStructuredData($params) {
-		$apiResponse = $this->app->sendRequest('WAMApi', 'getWAMIndex', $params)->getData();
+	protected function loadStructuredData($model, $params) {
+
+		try {
+
+			$apiResponse = $this->app->sendRequest('WAMApi', 'getWAMIndex', $params)->getData();
+
+		} catch (WikiaHttpException $e) {
+
+			$logMsg = 'Message: ' . $e->getLogMessage() . ' Details: ' . $e->getDetails();
+			Wikia::log(__METHOD__, false, $logMsg );
+			Wikia::logBacktrace(__METHOD__);
+
+		}
 
 		$data = [
 			'vertical_id' => $params['vertical_id'],
@@ -191,11 +205,11 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 	public function getStructuredData($data) {
 		$hubModel = $this->getWikiaHubsModel();
 
-
+		$realVerticalId = HubService::getCanonicalCategoryId($data['vertical_id']);
 		$structuredData = [
 			'wamPageUrl' => $this->getWamPageUrl(),
-			'verticalName' => $hubModel->getVerticalName($data['vertical_id']),
-			'canonicalVerticalName' => str_replace(' ', '', $hubModel->getCanonicalVerticalName($data['vertical_id'])),
+			'verticalName' => $hubModel->getVerticalName($realVerticalId),
+			'canonicalVerticalName' => str_replace(' ', '', $hubModel->getCanonicalVerticalName($realVerticalId)),
 			'ranking' => []
 		];
 
@@ -236,14 +250,12 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 	}
 
 	public function getWikiaHubsModel() {
-		return new WikiaHubsV2Model();
+		return new WikiaHubsModel();
 	}
 
 	public function render($data) {
 		$data['imagesHeight'] = $this->getModel()->getImageHeight();
 		$data['imagesWidth'] = $this->getModel()->getImageWidth();
-		$data['searchHubName'] = $this->getSearchHubName($data['verticalName']);
-		$data['specialSearchUrl'] = SpecialPage::getTitleFor( 'WikiaSearch' )->getFullUrl();
 		$data['scoreChangeMap'] = [self::WAM_SCORE_CHANGE_DOWN => 'down', self::WAM_SCORE_NO_CHANGE => 'nochange', self::WAM_SCORE_CHANGE_UP => 'up'];
 
 		return parent::render($data);
@@ -258,17 +270,15 @@ class MarketingToolboxModuleWAMService extends MarketingToolboxModuleNonEditable
 	}
 
 	/**
-	 * @desc Since search works better only for EN hub pages we implemented this simple method
-	 * 
-	 * @param int|string $vertical vertical name or id
-	 * @return string
+	 * Remove non-commercial wikis.
+	 * @param $data
+	 * @return mixed
 	 */
-	protected function getSearchHubName($vertical) {
-		$searchNames = F::app()->wg->WikiaHubsSearchMapping;
-		if( !empty($searchNames[$vertical]) ) {
-			return $searchNames[$vertical];
-		}
-		
-		return null;
+	protected function filterCommercialData( $data ) {
+		$service = $this->getLicensedWikisService();
+		$data['ranking'] = array_values( array_filter( $data['ranking'], function( $element ) use($service) {
+			return $service->isCommercialUseAllowedByUrl($element['wikiUrl']);
+		} ) );
+		return $data;
 	}
 }

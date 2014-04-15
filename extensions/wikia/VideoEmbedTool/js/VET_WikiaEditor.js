@@ -1,16 +1,17 @@
+/* global WikiaEditor, RTE, insertTags */
+(function (window, $) {
+	'use strict';
 
-(function(window, $) {
-
-	var VET_WikiaEditor = function(event) {
+	var editorVET = function (event) {
 		var mode = 'create',
 			embedPresets = {},
-			exists = false,
-			// Start on first or second screen of VET
-			startPoint = 1,
+			startPoint = 1, // Start on first or second screen of VET
 			element = false,
 			onClose = null,
 			triggeredFromRTE = event && event.type === 'rte',
-			callback = null;
+			callback = null,
+			wikiaEditor,
+			options;
 
 		if (event && event.data && event.data.element) {
 			// Video or Placeholder element was clicked in RTE
@@ -18,13 +19,13 @@
 		}
 
 		if (triggeredFromRTE) {
-			var wikiaEditor = WikiaEditor.getInstance();
+			wikiaEditor = WikiaEditor.getInstance();
 
 			// Handle MiniEditor focus
 			if (wikiaEditor.config.isMiniEditor) {
 				wikiaEditor.plugins.MiniEditor.hasFocus = true;
 
-				onClose = function() {
+				onClose = function () {
 					wikiaEditor.editorFocus();
 					wikiaEditor.plugins.MiniEditor.hasFocus = false;
 				};
@@ -46,34 +47,30 @@
 			}
 		}
 
-		if(mode === 'create') {
-			callback = function(embedData) {
+		if (mode === 'create') {
+			callback = function (embedData) {
 				var wikitag = $('#VideoEmbedTag').val();
-				if(!triggeredFromRTE) {
-					// I don't know what this is for - hyun
-					if (typeof RTE !== 'undefined') {
-						RTE.getInstanceEditor().getEditbox().focus();
-					} // end of I don't know
-					var editorTextArea = WikiaEditor.getInstance().getEditbox()[0];
-					editorTextArea.focus();
-					insertTags( wikitag, '', '', editorTextArea);
-				}
-				else if (element && element.hasClass('media-placeholder')) {
+				if (!triggeredFromRTE) {
+					window.WikiaEditor.getInstance().getEditbox().focus();
+					// VID-1177 IE11 execution order was inserting tags before switching focus
+					setTimeout(function () {
+						insertTags(wikitag, '', '');
+					}, 0);
+				} else if (element && element.hasClass('media-placeholder')) {
 					// replace "Add Video" placeholder
 					RTE.mediaEditor.update(element, wikitag, embedData);
-				}
-				else {
+				} else {
 					RTE.mediaEditor.addVideo(wikitag, embedData);
 				}
 
 			};
-		} else if(mode === 'edit') {
+		} else if (mode === 'edit') {
 			callback = function (embedData) {
 				if (element != 'undefined') {
 					var wikitext = '';
 
 					// Handle video placeholders in the editor [[File:Placeholder|video]]
-					if(element.hasClass('media-placeholder')) {
+					if (element.hasClass('media-placeholder')) {
 						wikitext = embedData.wikitext;
 						RTE.mediaEditor.update(element, wikitext, embedData);
 					} else {
@@ -101,8 +98,8 @@
 						if (element) {
 							// update existing video
 							RTE.mediaEditor.update(element, wikitext, embedData);
-							//
-							require(['wikia.vet'], function(vet) {
+
+							require(['wikia.vet'], function (vet) {
 								vet.close();
 							});
 						} else {
@@ -114,16 +111,16 @@
 			};
 		}
 
-		var options = {
+		options = {
 			callbackAfterEmbed: callback,
 			embedPresets: embedPresets,
 			onClose: onClose,
 			startPoint: startPoint
 		};
 
-		VET_loader.load(options);
-	}
+		window.vetLoader.load(options);
+	};
 
-	window.VET_WikiaEditor = VET_WikiaEditor;
+	window.VET_WikiaEditor = editorVET;
 
-})(this, jQuery);
+})(window, jQuery);

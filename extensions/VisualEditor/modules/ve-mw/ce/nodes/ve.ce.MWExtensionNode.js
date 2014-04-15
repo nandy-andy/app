@@ -10,16 +10,21 @@
 /**
  * ContentEditable MediaWiki extension node.
  *
+ * Configuration options for .update():
+ * - 'extsrc': override the contents of the tag (string)
+ * - 'attrs': override the attributes of the tag (object)
+ *
  * @class
  * @abstract
  * @extends ve.ce.LeafNode
  * @mixins ve.ce.FocusableNode
  * @mixins ve.ce.ProtectedNode
+ * @mixins ve.ce.RelocatableNode
  * @mixins ve.ce.GeneratedContentNode
  *
  * @constructor
  * @param {ve.dm.MWExtensionNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.MWExtensionNode = function VeCeMWExtensionNode( model, config ) {
 	// Parent constructor
@@ -28,30 +33,35 @@ ve.ce.MWExtensionNode = function VeCeMWExtensionNode( model, config ) {
 	// Mixin constructors
 	ve.ce.FocusableNode.call( this );
 	ve.ce.ProtectedNode.call( this );
+	ve.ce.RelocatableNode.call( this );
 	ve.ce.GeneratedContentNode.call( this );
 
 	// DOM changes
-	this.$.addClass( 've-ce-mwExtensionNode' );
+	this.$element.addClass( 've-ce-mwExtensionNode' );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.MWExtensionNode, ve.ce.LeafNode );
+OO.inheritClass( ve.ce.MWExtensionNode, ve.ce.LeafNode );
 
-ve.mixinClass( ve.ce.MWExtensionNode, ve.ce.FocusableNode );
-ve.mixinClass( ve.ce.MWExtensionNode, ve.ce.ProtectedNode );
-ve.mixinClass( ve.ce.MWExtensionNode, ve.ce.GeneratedContentNode );
+OO.mixinClass( ve.ce.MWExtensionNode, ve.ce.FocusableNode );
+OO.mixinClass( ve.ce.MWExtensionNode, ve.ce.ProtectedNode );
+OO.mixinClass( ve.ce.MWExtensionNode, ve.ce.RelocatableNode );
+OO.mixinClass( ve.ce.MWExtensionNode, ve.ce.GeneratedContentNode );
 
 /* Methods */
 
 /** */
-ve.ce.MWExtensionNode.prototype.generateContents = function () {
-	var deferred = $.Deferred(),
+ve.ce.MWExtensionNode.prototype.generateContents = function ( config ) {
+	var xhr,
+		deferred = $.Deferred(),
+		mwData = this.getModel().getAttribute( 'mw' ),
+		extsrc = config && config.extsrc !== undefined ? config.extsrc : mwData.body.extsrc,
+		attrs = config && config.attrs || mwData.attrs,
 		extensionNode = $( document.createElement( this.getModel().getExtensionName() ) )
-			.attr( this.getModel().getAttribute( 'mw' ).attrs )
-			.text( this.getModel().getAttribute( 'mw' ).body.extsrc );
+			.attr( attrs ).text( extsrc );
 
-	$.ajax( {
+	xhr = $.ajax( {
 		'url': mw.util.wikiScript( 'api' ),
 		'data': {
 			'action': 'visualeditor',
@@ -65,11 +75,12 @@ ve.ce.MWExtensionNode.prototype.generateContents = function () {
 		'type': 'POST',
 		// Wait up to 100 seconds before giving up
 		'timeout': 100000,
-		'cache': 'false',
-		'success': ve.bind( this.onParseSuccess, this, deferred ),
-		'error': ve.bind( this.onParseError, this, deferred )
-	} );
-	return deferred.promise();
+		'cache': 'false'
+	} )
+		.done( ve.bind( this.onParseSuccess, this, deferred ) )
+		.fail( ve.bind( this.onParseError, this, deferred ) );
+
+	return deferred.promise( { abort: xhr.abort } );
 };
 
 /**
@@ -79,10 +90,15 @@ ve.ce.MWExtensionNode.prototype.generateContents = function () {
  * @param {Object} response Response data
  */
 ve.ce.MWExtensionNode.prototype.onParseSuccess = function ( deferred, response ) {
-	var data = response.visualeditor, contentNodes = $( data.content ).get();
+	var data = response.visualeditor, contentNodes = this.$( data.content ).get();
 	deferred.resolve( contentNodes );
+};
+
+/** */
+ve.ce.MWExtensionNode.prototype.afterRender = function () {
 	// Rerender after images load
-	this.$.find( 'img' ).on( 'load', ve.bind( function () {
+	// TODO: ignore shields, and count multiple images
+	this.$element.find( 'img' ).on( 'load', ve.bind( function () {
 		this.emit( 'rerender' );
 	}, this ) );
 };

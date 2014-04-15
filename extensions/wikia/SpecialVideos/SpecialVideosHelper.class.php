@@ -11,6 +11,7 @@ class SpecialVideosHelper extends WikiaModel {
 	const THUMBNAIL_WIDTH = 330;
 	const THUMBNAIL_HEIGHT = 211;
 	const POSTED_IN_ARTICLES = 5;
+	public static $verticalCategoryFilters = [ "Games", "Lifestyle", "Entertainment" ];
 
 	/**
 	 * get list of filter options
@@ -24,6 +25,12 @@ class SpecialVideosHelper extends WikiaModel {
 			$options['premium'] = wfMessage( 'specialvideos-sort-featured' )->text();
 		}
 
+		if ( $this->wg->UseVideoVerticalFilters ) {
+			$options['trend:Games'] = wfMessage( 'specialvideos-filter-games' )->text();
+			$options['trend:Lifestyle'] = wfMessage( 'specialvideos-filter-lifestyle' )->text();
+			$options['trend:Entertainment'] = wfMessage( 'specialvideos-filter-entertainment' )->text();
+		}
+
 		return $options;
 	}
 
@@ -31,9 +38,11 @@ class SpecialVideosHelper extends WikiaModel {
 	 * get list of videos
 	 * @param string $sort [recent/popular/trend]
 	 * @param integer $page
+	 * @param array $providers
+	 * @param string $category
 	 * @return array $videos
 	 */
-	public function getVideos( $sort, $page ) {
+	public function getVideos( $sort, $page, $providers = array(), $category = '' ) {
 		wfProfileIn( __METHOD__ );
 
 		if ( $sort == 'premium' ) {
@@ -44,7 +53,7 @@ class SpecialVideosHelper extends WikiaModel {
 		}
 
 		$mediaService = new MediaQueryService();
-		$videoList = $mediaService->getVideoList( $sort, $filter, self::VIDEOS_PER_PAGE, $page );
+		$videoList = $mediaService->getVideoList( $sort, $filter, self::VIDEOS_PER_PAGE, $page, $providers, $category );
 
 		$videos = array();
 		$helper = new VideoHandlerHelper();
@@ -105,7 +114,7 @@ class SpecialVideosHelper extends WikiaModel {
 	public function getPostedInMsg( $truncatedList, $isTruncated ) {
 		$postedInMsg = '';
 		$articleLinks = array();
-		foreach( $truncatedList as $article ) {
+		foreach ( $truncatedList as $article ) {
 			$articleLinks[] = $this->getArticleLink( $article );
 		}
 

@@ -56,6 +56,13 @@ $messages['ar'] = array(
 	'category-exhibition-display-new' => 'عرض معرض التصنيف',
 );
 
+/** Azerbaijani (azərbaycanca)
+ * @author Cekli829
+ */
+$messages['az'] = array(
+	'category-exhibition-subcategories-header' => 'Alt kateqoriyalar',
+);
+
 /** Bikol Central (Bikol Central)
  * @author Geopoet
  */
@@ -72,11 +79,20 @@ $messages['bcl'] = array(
 );
 
 /** Bulgarian (български)
+ * @author Aquilax
  * @author DCLXVI
  */
 $messages['bg'] = array(
+	'category-exhibition-sorttype' => 'Начин на сортиране:',
+	'category-exhibition-alphabetical' => 'По азбучен ред',
+	'category-exhibition-mostvisited' => 'Най-посещавани',
+	'category-exhibition-recentedits' => 'Последно променени',
 	'category-exhibition-page-header' => 'Страници в категория „$1“',
 	'category-exhibition-subcategories-header' => 'Подкатегории',
+	'category-exhibition-media-header' => 'Медия в категория "$1"',
+	'category-exhibition-blogs-header' => 'Блог постове',
+	'category-exhibition-display-old' => 'Списъчен изглед на категория',
+	'category-exhibition-display-new' => 'Изложбен изглед на категория',
 );
 
 /** Breton (brezhoneg)
@@ -96,6 +112,7 @@ $messages['br'] = array(
 );
 
 /** Catalan (català)
+ * @author Fitoschido
  * @author Marcmpujol
  */
 $messages['ca'] = array(
@@ -105,13 +122,13 @@ $messages['ca'] = array(
 	'category-exhibition-recentedits' => 'Editades recentement',
 	'category-exhibition-page-header' => 'Pàgines en la categoraa "$1"',
 	'category-exhibition-subcategories-header' => 'Subcategories',
-	'category-exhibition-media-header' => 'Multimèdia en la categoria "$1"',
+	'category-exhibition-media-header' => 'Multimèdia en la categoria «$1»',
 	'category-exhibition-blogs-header' => 'Entrades de bloc',
 	'category-exhibition-display-old' => 'Visualització de la llista de categories',
 	'category-exhibition-display-new' => "Visualització d'exposició de la categoria",
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Dontlietome7
  */
 $messages['cs'] = array(
@@ -195,12 +212,16 @@ $messages['es'] = array(
 );
 
 /** Persian (فارسی)
+ * @author Reza1615
  * @author پاناروما
  */
 $messages['fa'] = array(
 	'category-exhibition-sorttype' => 'دسته بندی بر اساس نوع',
+	'category-exhibition-alphabetical' => 'الفبایی',
 	'category-exhibition-recentedits' => 'ویرایش‌های اخیر',
 	'category-exhibition-page-header' => 'صفحه‌های موجود در این رده «$1»',
+	'category-exhibition-subcategories-header' => 'زیررده‌ها',
+	'category-exhibition-blogs-header' => 'پست‌های وبلاگ',
 );
 
 /** Finnish (suomi)
@@ -356,6 +377,16 @@ $messages['kn'] = array(
 	'category-exhibition-subcategories-header' => 'ಉಪವರ್ಗಗಳು',
 );
 
+/** Korean (한국어)
+ * @author Leehoy
+ */
+$messages['ko'] = array(
+	'category-exhibition-sorttype' => '정렬 기준:',
+	'category-exhibition-alphabetical' => '알파벳순',
+	'category-exhibition-recentedits' => '최근 수정',
+	'category-exhibition-subcategories-header' => '하위 분류',
+);
+
 /** Luxembourgish (Lëtzebuergesch)
  */
 $messages['lb'] = array(
@@ -441,6 +472,7 @@ $messages['nb'] = array(
 /** Dutch (Nederlands)
  * @author McDutchie
  * @author Siebrand
+ * @author Yatalu
  */
 $messages['nl'] = array(
 	'category-exhibition-sorttype' => 'Sorteertype:',
@@ -448,7 +480,7 @@ $messages['nl'] = array(
 	'category-exhibition-mostvisited' => 'Meest bekeken',
 	'category-exhibition-recentedits' => 'Recent bewerkt',
 	'category-exhibition-page-header' => 'Pagina\'s in de categorie "$1"',
-	'category-exhibition-subcategories-header' => 'Ondercategorieën',
+	'category-exhibition-subcategories-header' => 'Subcategorieën',
 	'category-exhibition-media-header' => 'Mediabestanden in de categorie "$1"',
 	'category-exhibition-blogs-header' => 'Blogberichten',
 	'category-exhibition-display-old' => 'Categorielijstweergave',
@@ -615,20 +647,30 @@ $messages['sv'] = array(
 	'category-exhibition-alphabetical' => 'Alfabetisk',
 	'category-exhibition-mostvisited' => 'Mest visade',
 	'category-exhibition-recentedits' => 'Nyligen ändrade',
-	'category-exhibition-page-header' => 'Sidor i kategori "$1"',
+	'category-exhibition-page-header' => 'Sidor i kategorin "$1"',
 	'category-exhibition-subcategories-header' => 'Underkategorier',
-	'category-exhibition-media-header' => 'Media i kategori "$1"',
-	'category-exhibition-blogs-header' => 'Blogg-inlägg',
+	'category-exhibition-media-header' => 'Media i kategorin "$1"',
+	'category-exhibition-blogs-header' => 'Blogginlägg',
 	'category-exhibition-display-old' => 'Kategori-listvyn',
 	'category-exhibition-display-new' => 'Visning av kategoriutställning',
 );
 
 /** Telugu (తెలుగు)
+ * @author Chaduvari
+ * @author Ravichandra
  * @author Veeven
  */
 $messages['te'] = array(
+	'category-exhibition-sorttype' => 'క్రమ విధానం:',
+	'category-exhibition-alphabetical' => 'అక్షరక్రమంలో',
+	'category-exhibition-mostvisited' => 'ఎక్కువగా చూసినవి',
+	'category-exhibition-recentedits' => 'ఇటీవలే మార్చినది',
+	'category-exhibition-page-header' => '"$1" వర్గం లోని పేజీలు',
 	'category-exhibition-subcategories-header' => 'ఉపవర్గాలు',
+	'category-exhibition-media-header' => '"$1" వర్గంలోని మీడియా',
 	'category-exhibition-blogs-header' => 'బ్లాగు టపాలు',
+	'category-exhibition-display-old' => 'వర్గ జాబితా దృశ్యం',
+	'category-exhibition-display-new' => 'వర్గ ప్రదర్శన దృశ్యం',
 );
 
 /** Tagalog (Tagalog)
@@ -668,6 +710,22 @@ $messages['uk'] = array(
 	'category-exhibition-blogs-header' => 'Записи у блозі',
 	'category-exhibition-display-old' => 'Подання категорії списком',
 	'category-exhibition-display-new' => 'Подання категорії піктограмами',
+);
+
+/** Vietnamese (Tiếng Việt)
+ * @author Baonguyen21022003
+ */
+$messages['vi'] = array(
+	'category-exhibition-sorttype' => 'Phân loại các loại:',
+	'category-exhibition-alphabetical' => 'Bảng chữ cái',
+	'category-exhibition-mostvisited' => 'Truy cập nhiều nhất',
+	'category-exhibition-recentedits' => 'Biên tập, sửa đổi gần đây',
+	'category-exhibition-page-header' => 'Trang trong thể loại “$1”',
+	'category-exhibition-subcategories-header' => 'Thể loại con',
+	'category-exhibition-media-header' => 'Các tập tin trong thể loại “$1”',
+	'category-exhibition-blogs-header' => 'Bài đăng trên blog',
+	'category-exhibition-display-old' => 'Xem danh sách thể loại',
+	'category-exhibition-display-new' => 'Danh mục triển lãm xem',
 );
 
 /** Simplified Chinese (中文（简体）‎)

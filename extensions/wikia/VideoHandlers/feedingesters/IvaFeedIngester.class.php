@@ -24,7 +24,6 @@ class IvaFeedIngester extends VideoFeedIngester {
 		'Bakugan' => array( 'Bakugan' ),
 		'Lost' => array ( 1307 ),
 		'Full Metal Alchemist' => array( 'Full Metal Alchemist' ),
-		'Teen Titans' => array( 'Teen Titans' ),
 		'True Blood' => array( 'True Blood' ),
 		'iCarly' => array( 'iCarly' ),
 		'Dexter' => array( 'Dexter' ),
@@ -40,16 +39,14 @@ class IvaFeedIngester extends VideoFeedIngester {
 		'Glee' => array( 'Glee' ),
 		'My Little Pony' => array( 'My Little Pony' ),
 		'Vampire Diaries' => array( 'Vampire Diaries' ),
-		'Game of Thrones' => array( 'Game of Thrones', 785881, 722311 ),
+		'Game of Thrones' => array( 785881, 722311 ),
 		'Doctor Who' => array( 'Doctor Who' ),
 		'Gundam' => array( 'Gundam' ),
 		'Degrassi' => array( 'Degrassi' ),
 		'The Simpsons' => array( 'Simpsons' ),
 		'Thomas the Tank Engine' => array( 'Thomas the Tank Engine' ),
 		'Young Justice' => array( 'Young Justice' ),
-		'Batman' => array( 'Batman' ),
 		'Spongebob' => array( 'Spongebob' ),
-		'Spartacus' => array( 'Spartacus' ),
 		'Family Guy' => array( 'Family Guy' ),
 		'How I Met Your Mother' => array( 'How I Met Your Mother' ),
 		'Stargate' => array( 'Stargate' ),
@@ -65,18 +62,15 @@ class IvaFeedIngester extends VideoFeedIngester {
 		'Merlin' => array( 665766 ),
 		'Grimm' => array( 'Grimm' ),
 		'24' => array( 665302 ),
-		'Sons of Anarchy' => array( 'Sons of Anarchy' ),
 		'Saint Seiya' => array( 'Saint Seiya' ),
 		'Bones' => array( 156185 ),
 		'NCIS' => array( 'NCIS' ),
 		'Being Human' => array( 'Being Human' ),
 		'American Horror Story' => array( 'American Horror Story' ),
-		'Law and Order' => array( 'Law and Order' ),
-		'Person of Interest' => array( 'Person of Interest' ),
 		'Sailor Moon' => array( 'Sailor Moon' ),
 		'The Mentalist' => array( 172291 ),
 		'Friends' => array( 55503 ),
-		'YuYu Hakusho' => array( 'YuYu Hakusho' ),
+		'YuYu Hakusho' => array( 185192 ),
 		'House' => array( 422384 ),
 		'Revenge' => array( 618690 ),
 		'Justified' => array( 877316 ),
@@ -85,7 +79,6 @@ class IvaFeedIngester extends VideoFeedIngester {
 		'Prison Break' => array( 'Prison Break' ),
 		'Suits' => array( 976703 ),
 		'The Cleveland Show' => array( 'Cleveland Show' ),
-		'White Collar' => array( 'White Collar' ),
 		'H2O: Just Add Water' => array( 'H2O: Just Add Water' ),
 		'Fringe' => array( 459388 ),
 		'Misfits' => array( 828965 ),
@@ -136,7 +129,7 @@ class IvaFeedIngester extends VideoFeedIngester {
 		'Big Valley' => array( 781495 ),
 		'The Biggest Loser' => array( 566690 ),
 		'Blue Bloods' => array( 715185 ),
-		'Boardwalk Empire' => array( 843977 ),
+		'Boardwalk Empire' => array( 843977, 765800 ),
 		'The Boondocks' => array( 923306 ),
 		'Boston Legal' => array( 700828 ),
 		'Breaking In' => array( 593696 ),
@@ -419,6 +412,31 @@ class IvaFeedIngester extends VideoFeedIngester {
 		'The Wire' => array( 277081 ),
 		'Without a Trace' => array( 748167 ),
 		'X Factor' => array( 628297 ),
+		'Barney' => array( 3095, 357214, 632682, 305532, 411292, 703163, 722602, 321072, 817846, 828612, 271262, 99080, 8094, 7991 ),
+		'Jimmy Neutron' => array( 688512 ),
+		'Magic School Bus' => array( 817918 ),
+		'Homeland' => array( 363720 ),
+		'Duck Dynasty' => array( 517641 ),
+		'Ben 10' => array( 949668 ),
+		'Regular Show' => array( 856442 ),
+		'Bates Motel' => array( 297650 ),
+		"Bob's Burgers" => array( 933646 ),
+		'Parks and Recreation' => array( 55981 ),
+		'Chicago Fire' => array( 83410 ),
+		'The Michael J Fox Show' => array( 771396 ),
+		'Brooklyn Nine-Nine' => array( 535741 ),
+		'The Blacklist' => array( 569424 ),
+		'The Million Second Quiz' => array( 734825 ),
+		'Puppy in my Pocket' => array( 784857 ),
+		'Law and Order' => array( 311822 ),
+		"Marvel's Agent of Shield" => array( 489034 ),
+		'Spartacus' => array( 868477 ),
+		'Todd & the Book of Pure Evil' => array( 62390 ),
+		'The Vikings' => array( 402838 ),
+		'Save Me' => array( 997994 ),
+		'The Goodwin Games' => array( 268664 ),
+		'Deception' => array( 730834 ),
+		'The Americans' => array( 934933 ),
 	);
 
 	private static $EXCLUDE_MEDIA_IDS = array( 3, 12, 14, 15, 33, 36 );	// exclude song types
@@ -508,7 +526,7 @@ class IvaFeedIngester extends VideoFeedIngester {
 				$clipData['series'] = empty( $videoParams['series'] ) ? $program['title'] : $videoParams['series'];
 
 				if ( isset( $program['OkToEncodeAndServe'] ) && $program['OkToEncodeAndServe'] == false ) {
-					print "Skip: {$clipData['series']} (Publishedid:{$program['Publishedid']}) has OkToEncodeAndServe set to false.\n";
+					$this->videoSkipped( "Skip: {$clipData['series']} (Publishedid:{$program['Publishedid']}) has OkToEncodeAndServe set to false.\n" );
 					continue;
 				}
 
@@ -557,7 +575,8 @@ class IvaFeedIngester extends VideoFeedIngester {
 
 				$videoAssets = $program['VideoAssets']['results'];
 				$numVideos = count( $videoAssets );
-				print( "{$program['title']} (Series:{$clipData['series']}): Found $numVideos videos...\n" );
+				print( "{$program['title']} (Series:{$clipData['series']}): ");
+				$this->videoFound( $numVideos );
 
 				// add video assets
 				foreach ( $videoAssets as $videoAsset ) {
@@ -583,11 +602,11 @@ class IvaFeedIngester extends VideoFeedIngester {
 					$clipData['videoId'] = $videoAsset['Publishedid'];
 
 					if ( !empty( $videoAsset['ExpirationDate'] ) ) {
-						print "Skip: {$clipData['titleName']} (Id:{$clipData['videoId']}) has expiration date.\n";
+						$this->videoSkipped( "Skip: {$clipData['titleName']} (Id:{$clipData['videoId']}) has expiration date.\n" );
 						continue;
 					}
 
-					$clipData['thumbnail'] = $videoAsset['VideoAssetScreenCapture']['URL'];
+					$clipData['thumbnail'] = empty( $videoAsset['VideoAssetScreenCapture']['URL'] ) ? '' : $videoAsset['VideoAssetScreenCapture']['URL'];
 					$clipData['duration'] = $videoAsset['StreamLengthinseconds'];
 
 					$clipData['published'] = '';
@@ -753,19 +772,16 @@ class IvaFeedIngester extends VideoFeedIngester {
 
 		print( "Connecting to $url...\n" );
 
-		$req = MWHttpRequest::factory( $url );
-		$status = $req->execute();
-		if ( $status->isOK() ) {
-			$response = $req->getContent();
-		} else {
-			print( "ERROR: problem downloading content.\n" );
+		$resp = Http::request( 'GET', $url, array( 'noProxy' => true ) );
+		if ( $resp === false ) {
+			$this->videoErrors( "ERROR: problem downloading content.\n" );
 			wfProfileOut( __METHOD__ );
 
 			return false;
 		}
 
 		// parse response
-		$response = json_decode( $response, true );
+		$response = json_decode( $resp, true );
 
 		wfProfileOut( __METHOD__ );
 		return ( empty($response['d']['results']) ) ? array() : $response['d']['results'];
@@ -780,22 +796,25 @@ class IvaFeedIngester extends VideoFeedIngester {
 	public function generateCategories( $data, $categories ) {
 		wfProfileIn( __METHOD__ );
 
-		$categories[] = 'IVA';
 		$categories[] = $data['name'];
 		$categories[] = $data['series'];
 		$categories[] = $data['category'];
 
+		$categories = array_merge( $categories, $this->getAdditionalPageCategories( $categories ) );
+
 		// add language
-		if ( !empty( $data['language'] ) && strtolower( $data['language'] ) != 'english' ) {
+		if ( !empty( $data['language'] ) && !preg_match( "/\benglish\b/i", $data['language'] ) ) {
 			$categories[] = 'International';
 			$categories[] = $data['language'];
 		}
 
 		// add subtitle
-		if ( !empty( $data['subtitle'] ) && strtolower( $data['subtitle'] ) != 'english' ) {
+		if ( !empty( $data['subtitle'] ) && !preg_match( "/\benglish\b/i", $data['subtitle'] ) ) {
 			$categories[] = 'International';
 			$categories[] = $data['subtitle'];
 		}
+
+		$categories[] = 'IVA';
 
 		wfProfileOut( __METHOD__ );
 
@@ -806,26 +825,29 @@ class IvaFeedIngester extends VideoFeedIngester {
 	 * Massage some video metadata and generate URLs to this video's assets
 	 * @param string $name
 	 * @param array $data
+	 * @param boolean $generateUrl
 	 * @return array $data
 	 */
-	protected function generateRemoteAssetData( $name, $data ) {
-		$data['name'] = $name;
+	protected function generateRemoteAssetData( $name, $data, $generateUrl = true ) {
+		$data['assetTitle'] = $name;
 		$data['duration'] = $data['duration'] * 1000;
 		$data['published'] = empty( $data['published'] ) ? '' : strftime( '%Y-%m-%d', $data['published'] );
 
-		$url = str_replace( '$1', F::app()->wg->IvaApiConfig['AppId'], static::$ASSET_URL );
-		$url = str_replace( '$2', $data['videoId'], $url );
+		if ( $generateUrl ) {
+			$url = str_replace( '$1', F::app()->wg->IvaApiConfig['AppId'], static::$ASSET_URL );
+			$url = str_replace( '$2', $data['videoId'], $url );
 
-		$expired = 1609372800; // 2020-12-31
-		$url = str_replace( '$3', $expired, $url );
+			$expired = 1609372800; // 2020-12-31
+			$url = str_replace( '$3', $expired, $url );
 
-		$hash = $this->generateHash( $url );
-		$url .= '&h='.$hash;
+			$hash = $this->generateHash( $url );
+			$url .= '&h='.$hash;
 
-		$data['url'] = array(
-			'flash' => $url,
-			'iphone' => $url,
-		);
+			$data['url'] = array(
+				'flash' => $url,
+				'iphone' => $url,
+			);
+		}
 
 		return $data;
 	}

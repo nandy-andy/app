@@ -8,15 +8,17 @@
  * @var $afterContentHookText String
  * @var $afterBodyContent String
  * @var $afterBodyContent String
+ * @var $trendingArticles
  */
 ?>
 <section id=wkPage>
-	<?= $pageHeaderContent ;?>
+	<?= !empty( $pageHeaderContent ) ? $pageHeaderContent : ''; ?>
 	<article id=wkMainCnt>
 		<?= $bodyContent ;?>
 		<footer id=wkMainCntFtr>
 			<nav id=wkRltdCnt>
-			<?= !empty( $categoryLinks ) ? $categoryLinks : ''; ?>
+				<?= !empty( $trendingArticles ) ? $trendingArticles : ''; ?>
+				<?= !empty( $categoryLinks ) ? $categoryLinks : ''; ?>
 			</nav>
 			<?= !empty( $afterContentHookText ) ? $afterContentHookText : ''; ?>
 			<?= !empty( $afterBodyContent ) ? $afterBodyContent : ''; ?>

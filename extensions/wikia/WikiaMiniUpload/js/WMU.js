@@ -1,6 +1,6 @@
 /*
  * Author: Inez Korczynski, Bartek Lapinski
- * Converted from YUI to jQuery by Hyun
+ * Converted from YUI to jQuery by Hyun (except for the slider)
  */
 
 /**
@@ -53,7 +53,9 @@ var WMU_modal = null,
 	WMU_orgThumbSize = null,
 	WMU_width = null, // real width of full sized image
 	WMU_height = null,
-	WMU_widthChanges = 1,
+	WMU_exactWidth = null,    // Constrain search and upload > than this width
+	WMU_exactHeight = null,   // Constrain search and upload > than this height
+	WMU_aspectRatio = null, // Constrain searchand upload == this aspect ratio
 	WMU_refid = null,
 	WMU_wysiwygStart = 1,
 	WMU_ratio = 1,
@@ -65,8 +67,6 @@ var WMU_modal = null,
 	WMU_caption = 0,
 	WMU_link = 0,
 	WMU_box = -1,
-	WMU_width_par = null,
-	WMU_height_par = null,
 	WMU_skipDetails = false,
 	WMU_openedInEditor = true;
 
@@ -525,7 +525,7 @@ function WMU_loadMain() {
 		WMU_indicator(1, false);
 		if( $('#ImageQuery').length && $('#ImageQuery').is(':visible') ) {
 			$('#ImageQuery').focusNoScroll();
-		} 
+		}
 		var cookieMsg = document.cookie.indexOf("wmumainmesg=");
 		if (cookieMsg > -1 && document.cookie.charAt(cookieMsg + 12) == 0) {
 			$('#ImageUploadTextCont').hide();
@@ -538,7 +538,19 @@ function WMU_loadMain() {
 		}
 	}
 	WMU_indicator(1, true);
-	$.get(wgScriptPath + '/index.php?action=ajax&rs=WMU&method=loadMain', callback);
+
+	baseUrl = wgScriptPath + '/index.php?action=ajax&rs=WMU&method=loadMain';
+	if ( WMU_exactHeight != null ) {
+		baseUrl = baseUrl + '&exactHeight=' + WMU_exactHeight;
+	}
+	if ( WMU_exactWidth != null ) {
+		baseUrl = baseUrl + '&exactWidth=' + WMU_exactWidth;
+	}
+	if ( WMU_aspectRatio != null ) {
+		baseUrl = baseUrl + '&aspectRatio=' + WMU_aspectRatio;
+	}
+
+	$.get(baseUrl, callback);
 	WMU_curSourceId = 0;
 }
 
@@ -580,6 +592,13 @@ function WMU_recentlyUploaded(param, pagination) {
 	WMU_track({
 		label: 'paginate-' + pagination
 	});
+
+	if(WMU_exactHeight) {
+		param = (param.length > 0 ? param + '&' : '') + 'exactHeight='+WMU_exactHeight;
+	}
+	if(WMU_exactWidth) {
+		param = (param.length > 0 ? param + '&' : '') + 'exactWidth='+WMU_exactWidth;
+	}
 
 	WMU_indicator(2, true);
 	$.get(wgScriptPath + '/index.php?action=ajax&rs=WMU&method=recentlyUploaded&'+param, callback);
@@ -821,6 +840,7 @@ function WMU_displayDetails(responseText) {
 		}
 		var thumbSize = [image.width(), image.height()];
 		WMU_orgThumbSize = null;
+		// TODO: switch to jQuery slider, remove YUI!
 		WMU_slider = YAHOO.widget.Slider.getHorizSlider('ImageUploadSlider', 'ImageUploadSliderThumb', 0, 200);
 		WMU_slider.initialRound = true;
 		WMU_slider.getRealValue = function() {
@@ -902,8 +922,6 @@ function WMU_insertPlaceholder( box ) {
 	WMU_box_filled.push(box);
 	var to_update = $( '#WikiaImagePlaceholder' + box );
 	to_update.html($( '#ImageUploadCode' ).html());
-	//the class would need to be different if we had here the full-size...
-	to_update.className = '';
 	$.post(wgServer + wgScript + '?title=' + wgPageName  +'&action=purge');
 }
 
@@ -912,6 +930,16 @@ function WMU_insertImage(type) {
 	params.push('type='+type);
 	params.push('mwname='+$('#ImageUploadMWname').val());
 	params.push('tempid='+$('#ImageUploadTempid').val());
+
+	if(WMU_exactHeight) {
+		params.push('exactHeight='+WMU_exactHeight);
+	}
+	if(WMU_exactWidth) {
+		params.push('exactWidth='+WMU_exactWidth);
+	}
+	if(WMU_aspectRatio) {
+		params.push('aspectRatio='+WMU_aspectRatio);
+	}
 
 	var captionUpdateInput = $('#ImageUploadReplaceDefault');
 	if (captionUpdateInput.is(':hidden')) {
@@ -986,7 +1014,7 @@ function WMU_insertImage(type) {
 		params.push( 'article='+encodeURIComponent( wgTitle ) );
 		params.push( 'ns='+wgNamespaceNumber );
 		if( WMU_refid != null ) {
-			params.push( 'fck=true' );
+			params.push( 'ck=true' );
 		}
 	}
 
@@ -1012,6 +1040,7 @@ function WMU_insertImage(type) {
 			case 'error':
 				o.responseText = o.responseText.replace(/<script.*script>/, "" );
 				alert(o.responseText);
+				WMU_switchScreen('Summary');
 				break;
 			case 'conflict':
 				WMU_switchScreen('Conflict');

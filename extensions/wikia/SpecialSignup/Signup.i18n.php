@@ -60,7 +60,7 @@ $messages['ca'] = array(
 	'signup' => 'Registrar-se',
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Dontlietome7
  */
 $messages['cs'] = array(
@@ -111,6 +111,14 @@ $messages['es'] = array(
 $messages['fa'] = array(
 	'signup-desc' => 'نام مستعار [[{{#Special:Signup}}]] را به [[{{#Special:UserLogin}}/signup]] می‌افزاید',
 	'signup' => 'ثبت‌نام',
+);
+
+/** Finnish (suomi)
+ * @author Elseweyr
+ */
+$messages['fi'] = array(
+	'signup-desc' => 'Lisää alias [[{{#Special:Signup}}]] sivulle [[{{#Special:UserLogin}}/signup]]',
+	'signup' => 'Rekisteröidy',
 );
 
 /** French (français)
@@ -167,6 +175,13 @@ $messages['ja'] = array(
 $messages['ksh'] = array(
 	'signup-desc' => 'Deiht dä zohsäzlejje Name [[{{#Special:Signup}}]] för [[{{#Special:UserLogin}}/signup]] en et Wiki.',
 	'signup' => 'Aanmälde',
+);
+
+/** لوری (لوری)
+ * @author Mogoeilor
+ */
+$messages['lrc'] = array(
+	'signup' => 'اومائن د سيستم',
 );
 
 /** Macedonian (македонски)
@@ -276,11 +291,12 @@ $messages['shi'] = array(
 );
 
 /** Swedish (svenska)
+ * @author Jopparn
  * @author Tobulos1
  */
 $messages['sv'] = array(
 	'signup-desc' => 'Lägger till alias [[{{#Special:Signup}}]] för [[{{#Special:UserLogin}}/signup]]',
-	'signup' => 'Registrera',
+	'signup' => 'Skapa ett konto',
 );
 
 /** Tamil (தமிழ்)
@@ -303,6 +319,13 @@ $messages['te'] = array(
 $messages['tl'] = array(
 	'signup-desc' => 'Nagdaragdag ng [[{{#Special:Signup}}]] na pang-taguri para sa [[{{#Special:UserLogin}}/signup]]',
 	'signup' => 'Magpatala',
+);
+
+/** Turkish (Türkçe)
+ * @author Incelemeelemani
+ */
+$messages['tr'] = array(
+	'signup' => 'Hesap oluştur',
 );
 
 /** Tatar (Cyrillic script) (татарча)

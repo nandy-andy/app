@@ -5,17 +5,16 @@
 // Layout
 @import "core/layout";
 @import "wikiagrid";
+@import "lib/foundation.custom/foundation.custom";
 
 // Mixins
 @import "mixins/bodytext";
-@import "mixins/border-radius";
 @import "mixins/border-opacity";
 @import "mixins/box-shadow";
 @import "mixins/clearfix";
 @import "mixins/forms";
 @import "mixins/gradient";
 @import "mixins/menus";
-@import "mixins/opacity";
 @import "mixins/wordmark";
 
 // Core
@@ -28,6 +27,7 @@
 @import "core/reset";
 @import "core/modal";
 @import "core/body";
+@import "core/background";
 @import "core/globalelements";
 @import "core/GlobalHeader";
 @import "core/AccountNavigation";
@@ -49,6 +49,9 @@
 @import "core/GlobalNotification";
 @import "core/WikiaBar";
 @import "core/jquery.ui.autocomplete"; // TODO: load on demand
+@import "core/video-thumbnail";
+@import "core/MenuElement";
+@import "core/visualeditor";
 
 // Bootstrap
 @import "resources/wikia/libraries/bootstrap/tooltip";
@@ -66,9 +69,9 @@
 @import "extensions/wikia/WikiaPhotoGallery/css/slideshow"; // TODO: load on demand
 @import "extensions/wikia/WikiaBar/css/WikiaBar";
 @import "extensions/wikia/Chat2/css/ChatEntryPoint";
-@import "extensions/wikia/WikiaSeasons/css/WikiaSeasonsBar";
 @import "extensions/wikia/UserLogin/css/UserLoginDropdown";
-@import "extensions/wikia/Forum/css/RelatedForumDiscussion";	// on every article page
+@import "extensions/wikia/Forum/css/RelatedForumDiscussion"; // on every article page
+@import "extensions/wikia/TOC/css/toc.scss";
 
 // CSS (needs leading slash and file extension)
 @import "/extensions/wikia/CreatePage/css/CreatePage.css";
@@ -79,3 +82,13 @@
 @media print {
 	@import "print";
 }
+
+// Responsive layout files
+// These files override some of the styles for older extentions.
+@import "core/responsive-variables";
+@import "core/responsive-font-sizing";
+@import "core/responsive-core";
+@import "core/responsive-mainpage-tag";
+
+// VideosModule test
+@import "modules/VideosModule";

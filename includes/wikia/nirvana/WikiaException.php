@@ -52,10 +52,14 @@ abstract class WikiaBaseException extends MWException {
  */
 class WikiaException extends WikiaBaseException {
 	public function __construct($message = '', $code = 0, Exception $previous = null) {
+		global $wgRunningUnitTests, $wgNoDBUnits;
 		parent::__construct( $message, $code, $previous );
 
-		// log more details (macbre)
-		Wikia::logBacktrace( __METHOD__ );
+		if (!$wgRunningUnitTests && $wgNoDBUnits) {
+			// log more details (macbre)
+		Wikia::log( 'exceptions-WIKIA', get_class($this), $message, true );
+			Wikia::logBacktrace( __METHOD__ );
+		}
 	}
 }
 
@@ -207,4 +211,24 @@ abstract class NotImplementedException extends WikiaHttpException {
 abstract class InvalidDataException extends WikiaHttpException {
 	protected $code = 555;//custom HTTP status, 500 cannot be used as it makes us fallback to IOWA
 	protected $message = 'Invalid data';
+}
+
+class ControllerNotFoundException extends NotFoundException {
+	function __construct($name) {
+		parent::__construct("Controller not found: $name");
+	}	
+}
+
+class MethodNotFoundException extends NotFoundException {
+	function __construct($name) {
+		parent::__construct("Method not found: $name");
+	}	
+}
+
+class PermissionsException extends ForbiddenException {
+	protected $message = "No Permissions";
+
+	function __construct( $requiredPermission ) {
+		$this->details = "Current User don't have required permissions: " . $requiredPermission;
+	}
 }

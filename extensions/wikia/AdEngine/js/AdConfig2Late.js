@@ -1,52 +1,70 @@
+/*exported AdConfig2Late*/
 var AdConfig2Late = function (
 	// regular dependencies
 	log,
 	window,
+	abTest,
 
 	// AdProviders
-	adProviderGamePro,
-	adProviderLiftium2Dom,
-	adProviderNull
+	adProviderLiftium,
+	adProviderNull,
+	adProviderSevenOneMedia // TODO: move this to the early queue (remove jQuery dependency first)
 ) {
 	'use strict';
 
 	var logGroup = 'AdConfig2',
-		cityLang = window.wgContentLanguage,
-		getProvider;
+		liftiumSlotsToShowWithSevenOneMedia = {
+			'WIKIA_BAR_BOXAD_1': true,
+			'TOP_BUTTON_WIDE': true,
+			'TOP_BUTTON_WIDE.force': true
+		},
+		ie8 = window.navigator && window.navigator.userAgent && window.navigator.userAgent.match(/MSIE [6-8]\./),
+		sevenOneMediaDisabled = abTest && abTest.inGroup('SEVENONEMEDIA_DR', 'DISABLED');
 
-	getProvider = function(slot) {
+	function getProvider(slot) {
 		var slotname = slot[0];
 
 		log('getProvider', 5, logGroup);
 		log(slot, 5, logGroup);
 
-		if (slot[2] === 'Liftium2' || slot[2] === 'Liftium2Dom') {
-			if (adProviderLiftium2Dom.canHandleSlot(slot)) {
-				return adProviderLiftium2Dom;
-			} else {
-				log('#' + slotname + ' disabled. Forced Liftium2, but it can\'t handle it', 7, logGroup);
+		if (slot[2] === 'Liftium' || window.wgAdDriverForceLiftiumAd) {
+			if (adProviderLiftium.canHandleSlot(slot)) {
+				return adProviderLiftium;
+			}
+			log('#' + slotname + ' disabled. Forced Liftium, but it can\'t handle it', 7, logGroup);
+			return adProviderNull;
+		}
+
+		// First ask SevenOne Media
+		if (window.wgAdDriverUseSevenOneMedia) {
+			if (adProviderSevenOneMedia.canHandleSlot(slotname)) {
+				if (ie8) {
+					log('SevenOneMedia not supported on IE8. Using Null provider instead', 'warn', logGroup);
+					return adProviderNull;
+				}
+
+				if (sevenOneMediaDisabled) {
+					log('SevenOneMedia disabled by A/B test. Using Null provider instead', 'warn', logGroup);
+					return adProviderNull;
+				}
+
+				return adProviderSevenOneMedia;
+			}
+
+			if (!liftiumSlotsToShowWithSevenOneMedia[slot[0]]) {
 				return adProviderNull;
 			}
 		}
 
-		// First ask GamePro (german lang wiki)
-		if (cityLang === 'de') {
-			if (slotname === 'PREFOOTER_RIGHT_BOXAD' || slotname === 'LEFT_SKYSCRAPER_3') {
-				return adProviderNull;
-			}
-			if (adProviderGamePro.canHandleSlot(slot)) {
-				return adProviderGamePro;
-			}
-		}
-
-		if (adProviderLiftium2Dom.canHandleSlot(slot)) {
-			return adProviderLiftium2Dom;
+		if (adProviderLiftium.canHandleSlot(slotname)) {
+			return adProviderLiftium;
 		}
 
 		return adProviderNull;
-	};
+	}
 
 	return {
+		getDecorators: function () {},
 		getProvider: getProvider
 	};
 };

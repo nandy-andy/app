@@ -15,7 +15,7 @@ class MarketingToolboxModuleSliderService extends MarketingToolboxModuleEditable
 					array(
 						'required' => true
 					),
-					array('wrong-file' => 'marketing-toolbox-validator-wrong-file')
+					array('wrong-file' => 'wikia-hubs-validator-wrong-file')
 				),
 				'attributes' => array(
 					'class' => 'required wmu-file-name-input'
@@ -24,13 +24,13 @@ class MarketingToolboxModuleSliderService extends MarketingToolboxModuleEditable
 			);
 
 			$fields['strapline' . $i] = array(
-				'label' => wfMsg('marketing-toolbox-hub-module-slider-strapline'),
+				'label' => wfMessage('wikia-hubs-module-slider-strapline')->text(),
 				'validator' => new WikiaValidatorString(
 					array(
 						'required' => true,
 						'min' => 1
 					),
-					array('too_short' => 'marketing-toolbox-validator-string-short')
+					array('too_short' => 'wikia-hubs-validator-string-short')
 				),
 				'attributes' => array(
 					'class' => 'required'
@@ -38,13 +38,13 @@ class MarketingToolboxModuleSliderService extends MarketingToolboxModuleEditable
 			);
 
 			$fields['shortDesc' . $i] = array(
-				'label' => wfMsg('marketing-toolbox-hub-module-slider-short-description'),
+				'label' => wfMessage('wikia-hubs-module-slider-short-description')->text(),
 				'validator' => new WikiaValidatorString(
 					array(
 						'required' => true,
 						'min' => 1
 					),
-					array('too_short' => 'marketing-toolbox-validator-string-short')
+					array('too_short' => 'wikia-hubs-validator-string-short')
 				),
 				'attributes' => array(
 					'class' => 'required'
@@ -52,13 +52,13 @@ class MarketingToolboxModuleSliderService extends MarketingToolboxModuleEditable
 			);
 
 			$fields['longDesc' . $i] = array(
-				'label' => wfMsg('marketing-toolbox-hub-module-slider-long-description'),
+				'label' => wfMessage('wikia-hubs-module-slider-long-description')->text(),
 				'validator' => new WikiaValidatorString(
 					array(
 						'required' => true,
 						'min' => 1
 					),
-					array('too_short' => 'marketing-toolbox-validator-string-short')
+					array('too_short' => 'wikia-hubs-validator-string-short')
 				),
 				'attributes' => array(
 					'class' => 'required'
@@ -66,13 +66,13 @@ class MarketingToolboxModuleSliderService extends MarketingToolboxModuleEditable
 			);
 
 			$fields['url' . $i] = array(
-				'label' => wfMsg('marketing-toolbox-hub-module-slider-url'),
-				'validator' => new WikiaValidatorToolboxUrl(
+				'label' => wfMessage('wikia-hubs-module-slider-url')->text(),
+				'validator' => new WikiaValidatorRestrictiveUrl(
 					array(
 						'required' => true
 					),
 					array(
-						'wrong' => 'marketing-toolbox-validator-wrong-url'
+						'wrong' => 'wikia-hubs-validator-wrong-url'
 					)
 				),
 				'attributes' => array(
@@ -171,5 +171,18 @@ class MarketingToolboxModuleSliderService extends MarketingToolboxModuleEditable
 	public function getImageData( $image ) {
 		return ImagesService::getLocalFileThumbUrlAndSizes($image, 0, ImagesService::EXT_JPG);
 
+	}
+
+	/**
+	 * Remove slides from
+	 * @param $data
+	 * @return mixed
+	 */
+	protected function filterCommercialData( $data ) {
+		$service = $this->getLicensedWikisService();
+		$data['slides'] = array_values( array_filter( $data['slides'], function( $element ) use($service) {
+				return $service->isCommercialUseAllowedByUrl($element['url']);
+			} ) );
+		return $data;
 	}
 }

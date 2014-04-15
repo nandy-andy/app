@@ -14,9 +14,8 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 		print( "Connecting to $url...\n" );
 
 		$content = $this->getUrlContent( $url );
-
 		if ( !$content ) {
-			print( "ERROR: problem downloading content!\n" );
+			$this->videoErrors( "ERROR: problem downloading content.\n" );
 			wfProfileOut( __METHOD__ );
 
 			return 0;
@@ -48,7 +47,7 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 		@$doc->loadXML( $content );
 		$items = $doc->getElementsByTagName( 'item' );
 		$numItems = $items->length;
-		print( "Found $numItems items...\n" );
+		$this->videoFound( $numItems );
 
 		for ( $i = 0; $i < $numItems; $i++ ) {
 			$item = $items->item( $i );
@@ -59,6 +58,7 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 				$clipData['titleName'] = html_entity_decode( $elements->item(0)->textContent );
 				$clipData['uniqueName'] = $clipData['titleName'];
 			} else {
+				$this->videoSkipped();
 				continue;
 			}
 
@@ -76,12 +76,12 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 			}
 
 			if ( !array_key_exists( 'videoId', $clipData ) ) {
-				print "ERROR: videoId NOT found for {$clipData['titleName']} - {$clipData['description']}.\n";
+				$this->videoWarnings( "ERROR: videoId NOT found for {$clipData['titleName']} - {$clipData['description']}.\n" );
 				continue;
 			}
 
 			if ( empty( $clipData['videoId'] ) ) {
-				print "ERROR: Empty videoId for {$clipData['titleName']} - {$clipData['description']}.\n";
+				$this->videoWarnings( "ERROR: Empty videoId for {$clipData['titleName']} - {$clipData['description']}.\n" );
 				continue;
 			}
 
@@ -90,7 +90,7 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 			$clipData['ageGate'] = ( $elements->length > 0 && $elements->item(0)->textContent == 'nonadult' ) ? 0 : 1;
 
 			if ( $clipData['ageGate'] ) {
-				print "SKIP: Skipping adult video: {$clipData['titleName']} ({$clipData['videoId']}).\n";
+				$this->videoSkipped( "SKIP: Skipping adult video: {$clipData['titleName']} ({$clipData['videoId']}).\n" );
 				continue;
 			}
 
@@ -145,7 +145,7 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 			$msg = '';
 			if ( $this->isClipTypeBlacklisted( $clipData ) ) {
 				if ( $debug ) {
-					print "Skipping {$clipData['titleName']} - {$clipData['description']}. On clip type blacklist\n";
+					$this->videoSkipped( "Skipping {$clipData['titleName']} - {$clipData['description']}. On clip type blacklist\n" );
 				}
 			} else {
 				$createParams = array( 'addlCategories' => $addlCategories, 'debug' => $debug );
@@ -179,11 +179,15 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 
 		if ( !empty( $data['name'] ) ) {
 			$categories[] = $data['name'];
+			$addition = $this->getAdditionalPageCategory( $data['name'] );
+			if ( !empty( $addition ) ) {
+				$categories[] = $addition;
+			}
 		}
 
 		wfProfileOut( __METHOD__ );
 
-		return $categories;
+		return $this->getUniqueArray( $categories );
 	}
 
 	/**
@@ -213,14 +217,11 @@ class AnyclipFeedIngester extends VideoFeedIngester {
 		wfProfileIn( __METHOD__ );
 
 		$url = AnyclipApiWrapper::getApi( $code );
-		$req = MWHttpRequest::factory( $url );
-		$status = $req->execute();
-		if( $status->isOK() ) {
-			$response = $req->getContent();
+		$response = Http::request( 'GET', $url, array( 'noProxy' => true ) );
+		if ( $response !== false ) {
 			$content = json_decode( $response, true );
 
 			$title = AnyclipApiWrapper::getClipName( $content );
-
 			if ( !empty( $title ) ) {
 				$titleName = $title;
 			}

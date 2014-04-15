@@ -22,7 +22,7 @@ ve.dm.LanguageAnnotation = function VeDmLanguageAnnotation( element ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.dm.LanguageAnnotation, ve.dm.Annotation );
+OO.inheritClass( ve.dm.LanguageAnnotation, ve.dm.Annotation );
 
 /* Static Properties */
 
@@ -60,9 +60,15 @@ ve.dm.LanguageAnnotation.static.toDomElements = function ( dataElement, doc ) {
 
 /* Methods */
 
-// TODO:
-// Set up a proper comparable method for lang and dir attributes
-// ve.dm.LanguageAnnotation.prototype.getComparableObject
+/**
+ * @returns {Object}
+ */
+ve.dm.LanguageAnnotation.prototype.getComparableObject = function () {
+	return {
+		'type': 'meta/language',
+		'lang': this.getAttribute( 'lang' )
+	};
+};
 
 /* Registration */
 

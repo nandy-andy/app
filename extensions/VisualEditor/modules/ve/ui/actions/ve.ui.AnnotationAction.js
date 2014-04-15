@@ -20,9 +20,11 @@ ve.ui.AnnotationAction = function VeUiAnnotationAction( surface ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.AnnotationAction, ve.ui.Action );
+OO.inheritClass( ve.ui.AnnotationAction, ve.ui.Action );
 
 /* Static Properties */
+
+ve.ui.AnnotationAction.static.name = 'annotation';
 
 /**
  * List of allowed methods for the action.
@@ -30,7 +32,7 @@ ve.inheritClass( ve.ui.AnnotationAction, ve.ui.Action );
  * @static
  * @property
  */
-ve.ui.AnnotationAction.static.methods = ['set', 'clear', 'toggle', 'clearAll'];
+ve.ui.AnnotationAction.static.methods = [ 'set', 'clear', 'toggle', 'clearAll' ];
 
 /* Methods */
 
@@ -109,4 +111,4 @@ ve.ui.AnnotationAction.prototype.clearAll = function () {
 
 /* Registration */
 
-ve.ui.actionFactory.register( 'annotation', ve.ui.AnnotationAction );
+ve.ui.actionFactory.register( ve.ui.AnnotationAction );

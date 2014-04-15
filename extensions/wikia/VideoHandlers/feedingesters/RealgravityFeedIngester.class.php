@@ -9,10 +9,6 @@ class RealgravityFeedIngester extends VideoFeedIngester {
 			'name' => 'LeGourmet TV',
 			'categories' => array( 'Lifestyle', 'Le Gourmet' )
 		),
-		141 => array(
-			'name' => 'HowCast',
-			'categories' => array( 'HowTo', 'Lifestyle' )
-		),
 		647 => array(
 			'name' => 'Howcast - Cars and Transportation',
 			'categories' => array( 'HowTo', 'HowCast', 'Lifestyle', 'Cars', 'Transportation' )
@@ -51,31 +47,31 @@ class RealgravityFeedIngester extends VideoFeedIngester {
 		),
 		419 => array(
 			'name' => 'Outside Lines Travel',
-			'categories' => array()
+			'categories' => array( 'Lifestyle' )
 		),
 		196 => array(
 			'name' => 'VIDCAT Fashion TV',
-			'categories' => array()
+			'categories' => array( 'Lifestyle' )
 		),
 		586 => array(
 			'name' => 'Billboard',
-			'categories' => array()
+			'categories' => array( 'Entertainment' )
 		),
 		628 => array(
 			'name' => 'Sugar Inc. - FitSugar',
-			'categories' => array( 'Health & fitness' )
+			'categories' => array( 'Health & fitness', 'Lifestyle' )
 		),
 		629 => array(
 			'name' => 'Sugar Inc. - FabSugar',
-			'categories' => array( 'Fashion' )
+			'categories' => array( 'Fashion', 'Lifestyle' )
 		),
 		630 => array(
 			'name' => 'Sugar Inc. - BellaSugar',
-			'categories' => array( 'Beauty' )
+			'categories' => array( 'Beauty', 'Lifestyle' )
 		),
 		631 => array(
 			'name' => 'Sugar Inc. - YumSugar',
-			'categories' => array( 'Food' )
+			'categories' => array( 'Food', 'Lifestyle' )
 		),
 	);
 
@@ -118,31 +114,26 @@ class RealgravityFeedIngester extends VideoFeedIngester {
 		$articlesCreated = 0;
 
 		do {
-			$numVideos = 0;
-
 			// connect to provider API
 			$url = $this->initFeedUrl( $marketplaceId, $startDate, $page++ );
 			print( "Connecting to $url...\n" );
 
-			$req = MWHttpRequest::factory( $url );
-			$status = $req->execute();
-			if( $status->isOK() ) {
-				$response = $req->getContent();
-			} else {
-				print( "ERROR: problem downloading content.\n" );
+			$resp = Http::request( 'GET', $url, array( 'noProxy' => true ) );
+			if ( $resp === false ) {
+				$this->videoErrors( "ERROR: problem downloading content.\n" );
 				wfProfileOut( __METHOD__ );
 
 				return 0;
 			}
 
 			// parse response
-			$response = json_decode( $response, true );
+			$response = json_decode( $resp, true );
 			$videos = empty( $response['contents'] ) ? array() : $response['contents'] ;
 
 			$numVideos = count( $videos );
-			print("Found $numVideos videos...\n");
+			$this->videoFound( $numVideos );
 
-			foreach( $videos as $video ) {
+			foreach ( $videos as $video ) {
 				$clipData = array();
 				$clipData['titleName'] = trim( $video['title'] );
 				$clipData['videoId'] = $video['id'];
@@ -170,7 +161,7 @@ class RealgravityFeedIngester extends VideoFeedIngester {
 					print "ERROR: $msg\n";
 				}
 			}
-		} while( $numVideos == self::API_PAGE_SIZE );
+		} while ( $numVideos == self::API_PAGE_SIZE );
 
 		wfProfileOut( __METHOD__ );
 
@@ -205,12 +196,15 @@ class RealgravityFeedIngester extends VideoFeedIngester {
 	public function generateCategories( $data, $categories ) {
 		wfProfileIn( __METHOD__ );
 
-		$categories[] = 'RealGravity';
 		$categories[] = $data['marketplaceName'];
+
+		$categories = array_merge( $categories, $this->getAdditionalPageCategories( $categories ) );
+
+		$categories[] = 'RealGravity';
 
 		wfProfileOut( __METHOD__ );
 
-		return $categories;
+		return $this->getUniqueArray( $categories );
 	}
 
 	/**

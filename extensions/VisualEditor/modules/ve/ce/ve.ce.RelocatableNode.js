@@ -14,26 +14,27 @@
  * @abstract
  *
  * @constructor
- * @param {jQuery} [$relocatable=this.$] Element which can be relocated
+ * @param {jQuery} [$relocatable=this.$element] Element which can be relocated
  */
 ve.ce.RelocatableNode = function VeCeRelocatableNode( $relocatable ) {
 	// Properties
 	this.relocatingSurface = null;
-	this.$relocatable = $relocatable || this.$;
-	this.$relocatableMarker = this.$$( '<img>' );
+	this.$relocatable = $relocatable || this.$element;
+	this.$relocatableMarker = this.$( '<img>' );
 
 	// Events
 	this.connect( this, {
 		'focus': 'onRelocatableFocus',
 		'blur': 'onRelocatableBlur',
-		'resize': 'onRelocatableResize',
+		'resizeEnd': 'onRelocatableResize',
 		'live': 'onRelocatableLive'
 	} );
 
 	// Initialization
 	this.$relocatableMarker
 		.addClass( 've-ce-relocatableNode-marker' )
-		.attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' )
+		// Do not change this src encoding. This encoding is required for the desired UI effect.
+		.attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' )
 		.on( {
 			'dragstart': ve.bind( this.onRelocatableDragStart, this ),
 			'dragend': ve.bind( this.onRelocatableDragEnd, this )
@@ -126,8 +127,8 @@ ve.ce.RelocatableNode.prototype.onRelocatableDragEnd = function () {
  * @method
  */
 ve.ce.RelocatableNode.prototype.setRelocatableMarkerSizeAndPosition = function () {
-	var offset = ve.Element.getRelativePosition(
-		this.$relocatable, this.getRoot().getSurface().getSurface().$
+	var offset = OO.ui.Element.getRelativePosition(
+		this.$relocatable, this.getRoot().getSurface().getSurface().$element
 	);
 
 	this.$relocatableMarker.css( {

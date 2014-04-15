@@ -7,11 +7,17 @@
 
 class WikiaApiController extends WikiaController {
 	const DEFAULT_FORMAT_INDEX = 0;
+	const API_ENDPOINT_TEST = 'test';
+	const API_ENDPOINT_INTERNAL = 'internal';
 
 	private $allowedFormats = array(
 		'json',
 		'raw'
 	);
+
+	public function __construct(){
+		parent::__construct();
+	}
 
 	/**
 	 * block throiwng WikiaException for WikiaApi
@@ -32,11 +38,17 @@ class WikiaApiController extends WikiaController {
 	 * @throws WikiaException
 	 */
 	final public function init() {
+		$webRequest = F::app()->wg->Request;
+		$accessService = new ApiAccessService( $this->getRequest() );
+		$controller = $webRequest->getVal( 'controller' );
+		$method = $webRequest->getVal( 'method' );
+		$accessService->checkUse( $controller.'Controller', $method );
+
 		if ( !$this->request->isInternal() ) {
 			if ($this->hideNonCommercialContent()) {
 				$this->blockIfNonCommercialOnly();				
 			}
-			$paramKeys = array_keys( F::app()->wg->Request->getQueryValues() );
+			$paramKeys = array_keys( $webRequest->getQueryValues() );
 			$count = count( $paramKeys );
 
 			if ( $count >= 2 && $paramKeys[0] === 'controller' && $paramKeys[1] === 'method') {
@@ -123,7 +135,7 @@ class WikiaApiController extends WikiaController {
 	public function hideNonCommercialContent() {
 		return stripos($this->request->getScriptUrl(), "/api/v1")===0;
 	}
-	
+		
 	/** Block content if this wiki is does not allow commercial use of it's content outside of Wikia
 	 * Raises WikiaHttpException
 	 *
@@ -135,12 +147,82 @@ class WikiaApiController extends WikiaController {
 			throw new ApiNonCommercialOnlyException();
 		}
 	}
+	
+	/** Get version of the APIs that caller is trying to use.
+	 * Currently there are 3 possible values:
+	 * - 'internal' if caller is using wikia.php entrypoint
+	 * - '1' if caller is using /api/v1 entrypoint
+	 * - 'test' if caller is using /api/test entrypoint
+	 */
+	public function getApiVersion() {
+		$url = $this->request->getScriptUrl();
+		if (stripos($this->request->getScriptUrl(), "/api/v1")===0) {
+			return 1;
+		} else if (stripos($this->request->getScriptUrl(), "/api/test")===0) {
+			return self::API_ENDPOINT_TEST;
+		} else {
+			return self::API_ENDPOINT_INTERNAL;
+		}
+	}
+	
+	protected function getSkipMethods() {
+		return array_merge(parent::getSkipMethods(),
+			['getApiVersion', 'blockIfNonCommercialOnly', 'hideNonCommercialContent']);
+	}
+
+	/**
+	 * Check whether to serve images (using $wgApiDisableImages)
+	 * @return bool
+	 */
+	protected function serveImages() {
+		global  $wgApiDisableImages;
+		if($this->request->isInternal() || $this->getApiVersion() == self::API_ENDPOINT_INTERNAL ){
+			return true;
+		}
+		return ( isset( $wgApiDisableImages ) && $wgApiDisableImages === true ) ? false : true;
+	}
+
+	/**
+	 * @param $data data to set as output
+	 * @param string|array $imageFields - fields to remove if we don't serve images
+	 * @param int $cacheValidity set only if greater than 0
+	 */
+	protected function setResponseData( $data, $imageFields = null, $cacheValidity = 0 ) {
+		if ( !$this->serveImages() && is_array( $data ) && !empty( $imageFields ) ) {
+			if ( !is_array( $imageFields ) ) {
+				$imageFields = [ $imageFields ];
+			}
+			//convert array to [ field_name => N ]
+			$imageFields = array_flip( $imageFields );
+			self::clear_array( $data, $imageFields );
+		}
+		$this->response->setData( $data );
+		if ( $cacheValidity > 0 ) {
+			$this->response->setCacheValidity( $cacheValidity );
+		}
+	}
+
+	/**
+	 * recursive search in array and clean values where key is in "$fields"
+	 * @param $input
+	 * @param $fields
+	 */
+	protected static function clear_array( &$input, &$fields ) {
+		foreach ( $input as $key => &$val ) {
+			$isArray = is_array( $val );
+			if ( array_key_exists( $key, $fields ) ) {
+				$val = $isArray ? [ ] : null;
+			} elseif ( $isArray ) {
+				self::clear_array( $val, $fields );
+			}
+		}
+	}
+
 }
 
 
 class ApiNonCommercialOnlyException extends ForbiddenException {
-	protected $details = "API access to this wiki is disabled because \
-it's license disallows commercial use outside of Wikia.";
+	protected $details = "API access to this wiki is disabled because it's license disallows commercial use outside of Wikia.";
 }
 	
 	

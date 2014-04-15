@@ -4,6 +4,9 @@
  * TaskManager task to go through a list of images and delete them.
  */
 
+//use \Wikia\Logger\WikiaLogger; // does not autoload inside maintenance script
+ 
+
 class PromoteImageReviewTask extends BatchTask {
 	var $mType,
 		$mVisible,
@@ -100,6 +103,8 @@ class PromoteImageReviewTask extends BatchTask {
 	 * @return bool
 	 */
 	function uploadImages($targetWikiId, $wikis) {
+		$isError = false;
+
 		$targetWikiLang = WikiFactory::getVarValueByName('wgLanguageCode', $targetWikiId);
 
 		foreach($wikis as $sourceWikiId => $images) {
@@ -114,6 +119,8 @@ class PromoteImageReviewTask extends BatchTask {
 						'id' => $result['id'],
 						'name' => $result['name'],
 					);
+				} else {
+					$isError = true;
 				}
 			}
 
@@ -146,10 +153,9 @@ class PromoteImageReviewTask extends BatchTask {
 		if( !empty($uploadedImages) ) {
 		//if wikis have been added by import script or regularly by Special:Promote
 			$this->model->purgeVisualizationWikisListCache($targetWikiId, $targetWikiLang);
-			return true;
 		}
 
-		return false;
+		return !$isError;
 	}
 
 	function uploadSingleImage($imageId, $destinationName, $targetWikiId, $sourceWikiId) {
@@ -196,12 +202,23 @@ class PromoteImageReviewTask extends BatchTask {
 		$sCommand .= " --destimagename=" . escapeshellarg($destinationName);
 		$sCommand .= " --wikiid=" . escapeshellarg( $sourceWikiId );
 		$sCommand .= " --conf {$wgWikiaLocalSettingsPath}";
-
+		
+		$logdata = [
+			'command' => $sCommand,
+			'city_url' => $city_url
+		];
+		//WikiaLogger::getInstance()->debug( "PromoteImageReviewTask started", $logdata );
+		
 		$output = wfShellExec($sCommand, $retval);
-
+		
+		$logdata['output'] = $output;
+		$logdata['retval'] = $retval;
+		
 		if( $retval ) {
+			//WikiaLogger::getInstance()->error("PromoteImageReviewTask failed", $logdata);		
 			$this->log('Upload error! (' . $city_url . '). Error code returned: ' . $retval . ' Error was: ' . $output);
 		} else {
+			//WikiaLogger::getInstance()->debug("PromoteImageReviewTask finished", $logdata);		
 			$this->log('Upload successful: '.$output);
 		}
 

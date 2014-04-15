@@ -1,6 +1,4 @@
 <?php
-include( dirname(__FILE__) . '/../../../SpecialMarketingToolbox/validators/WikiaValidatorToolboxUrl.class.php' );
-include( dirname(__FILE__) . '/../../../SpecialMarketingToolbox/validators/WikiaValidatorUsersUrl.class.php' );
 
 class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 	/**
@@ -136,6 +134,8 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 			'url1' => 'http://www.wikia.com',
 			'wikiUrl1' => 'assassinscreed.wikia.com',
 			'UserName1' => 'Master Sima Yi',
+			'headline' => 'testHeadline',
+			'suggest' => 'testButton'
 		);
 
 		$expectedData = array(
@@ -149,8 +149,11 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 					'userUrl' => 'http://www.assassinscreed.wikia.com/wiki/User:Master_Sima_Yi',
 					'wikiUrl' => 'assassinscreed.wikia.com',
 					'quote' => 'Just a simple description. Visit <a href="nandytest.wikia.com/">nAndy wiki</a> to order some food!',
+					'photoName' => 'First SLS Roadster.jpg',
 				),
-			)
+			),
+			'headline' => 'testHeadline',
+			'button' => 'testButton'
 		);
 
 		$out[] = array($inputData, $expectedData);
@@ -184,6 +187,7 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 					'userUrl' => 'http://www.assassinscreed.wikia.com/wiki/User:Master_Sima_Yi',
 					'wikiUrl' => 'assassinscreed.wikia.com',
 					'quote' => 'Just a simple description. Visit <a href="nandytest.wikia.com/">nAndy wiki</a> to order some food!',
+					'photoName' => 'First SLS Roadster.jpg',
 				),
 				array(
 					'articleTitle' => 'Kotleciarnia',
@@ -194,8 +198,11 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 					'userUrl' => 'http://www.nandytest.wikia.com/wiki/User:Andrzej_Łukaszewski',
 					'wikiUrl' => 'nandytest.wikia.com',
 					'quote' => 'Pure awesomeness...',
+					'photoName' => 'FakeImage.png'
 				),
-			)
+			),
+			'headline' => null,
+			'button' => null
 		);
 
 		$out[] = array($inputData, $expectedData);
@@ -215,6 +222,8 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 			'url2' => 'http://www.nandytest.wikia.com',
 			'wikiUrl2' => 'nandytest.wikia.com',
 			'UserName2' => 'Andrzej Łukaszewski',
+			'headline' => 'testHeadline2',
+			'suggest' => 'testButton2'
 		);
 
 		$expectedData = array(
@@ -228,6 +237,7 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 					'userUrl' => 'http://www.assassinscreed.wikia.com/wiki/User:Master_Sima_Yi',
 					'wikiUrl' => 'assassinscreed.wikia.com',
 					'quote' => 'Just a simple description. Visit <a href="nandytest.wikia.com/">nAndy wiki</a> to order some food!',
+					'photoName' => null,
 				),
 				array(
 					'articleTitle' => 'Kotleciarnia',
@@ -238,8 +248,11 @@ class MarketingToolboxModuleFromthecommunityServiceTest extends WikiaBaseTest {
 					'userUrl' => 'http://www.nandytest.wikia.com/wiki/User:Andrzej_Łukaszewski',
 					'wikiUrl' => 'nandytest.wikia.com',
 					'quote' => 'Pure awesomeness...',
+					'photoName' => 'FakeImage.png',
 				),
-			)
+			),
+			'headline' => 'testHeadline2',
+			'button' => 'testButton2'
 		);
 
 		$out[] = array($inputData, $expectedData);

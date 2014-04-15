@@ -4,66 +4,77 @@
  */
 
 /*global document, window */
-/*global Geo, Wikia */
-/*global ghostwriter, Krux */
+/*global Geo, Wikia, Krux, SlotTracker */
 /*global AdConfig2, AdEngine2, DartUrl, EvolveHelper, SlotTweaker, ScriptWriter */
-/*global WikiaDartHelper, WikiaGptHelper, WikiaFullGptHelper */
-/*global AdProviderAdDriver2, AdProviderEvolve, AdProviderGpt, AdProviderGamePro, AdProviderLater, AdProviderNull */
-/*global AdLogicDartSubdomain, AdLogicHighValueCountry, AdLogicPageDimensions, AdLogicPageLevelParams */
-/*global AdLogicPageLevelParamsLegacy */
+/*global WikiaDartHelper, WikiaFullGptHelper, AdLogicPageDimensions */
+/*global AdProviderEvolve, AdProviderDirectGpt, AdProviderLater, AdProviderNull */
+/*global AdLogicDartSubdomain, AdLogicHighValueCountry, AdDecoratorPageDimensions, AdLogicPageLevelParams */
+/*global AdLogicPageLevelParamsLegacy, GptSlotConfig */
 /*global require*/
 /*jslint newcap:true */
+/*jshint camelcase:false */
+/*jshint maxlen:200*/
 
-(function (log, tracker, window, ghostwriter, document, Geo, LazyQueue, Cookies, Cache, Krux, abTest) {
+(function (log, tracker, window, document, Geo, LazyQueue, Cookies, Cache, Krux, abTest) {
 	'use strict';
 
 	var module = 'AdEngine2.run',
 		adConfig,
 		adEngine,
+		slotTracker,
 		adLogicDartSubdomain,
 		adLogicHighValueCountry,
 		adLogicPageLevelParams,
 		adLogicPageLevelParamsLegacy,
 		adLogicPageDimensions,
+		adDecoratorPageDimensions,
 		scriptWriter,
 		dartUrl,
 		wikiaDart,
-		wikiaGpt,
-		wikiaFullGpt,
+		wikiaGptHelper,
 		evolveHelper,
-		adProviderAdDriver2,
-		adProviderGpt,
+		adProviderDirectGpt,
 		adProviderEvolve,
-		adProviderGamePro,
 		adProviderLater,
 		adProviderNull,
 		slotTweaker,
+		gptSlotConfig,
 
 		queueForLateAds,
-		adConfigForLateAds;
+		adConfigForLateAds,
+		params,
+		param,
+		value;
+
+	// Don't show ads when Sony requests the page
+	window.wgShowAds = window.wgShowAds && !window.navigator.userAgent.match(/sony_tvs/);
+
+	// Use PostScribe for ScriptWriter implementation when SevenOne Media ads are enabled
+	window.wgUsePostScribe = window.wgUsePostScribe || window.wgAdDriverUseSevenOneMedia;
+
+	slotTracker = SlotTracker(window, log, tracker);
 
 	// Construct Ad Engine
-	adEngine = AdEngine2(log, LazyQueue);
+	adEngine = AdEngine2(log, LazyQueue, slotTracker);
 
 	// Construct various helpers
 	slotTweaker = SlotTweaker(log, document, window);
 	dartUrl = DartUrl();
+	gptSlotConfig = GptSlotConfig();
 	adLogicDartSubdomain = AdLogicDartSubdomain(Geo);
 	adLogicHighValueCountry = AdLogicHighValueCountry(window);
 	adLogicPageDimensions = AdLogicPageDimensions(window, document, log, slotTweaker);
+	adDecoratorPageDimensions = AdDecoratorPageDimensions(adLogicPageDimensions, log);
 	adLogicPageLevelParams = AdLogicPageLevelParams(log, window, Krux, adLogicPageDimensions, abTest);
 	adLogicPageLevelParamsLegacy = AdLogicPageLevelParamsLegacy(log, window, adLogicPageLevelParams, Krux, dartUrl);
-	scriptWriter = ScriptWriter(log, ghostwriter, document);
+	scriptWriter = ScriptWriter(document, log, window);
 	wikiaDart = WikiaDartHelper(log, adLogicPageLevelParams, dartUrl, adLogicDartSubdomain);
-	wikiaGpt = WikiaGptHelper(log, window, document, adLogicPageLevelParams);
-	wikiaFullGpt = WikiaFullGptHelper(log, window, document, adLogicPageLevelParams);
+	wikiaGptHelper = WikiaGptHelper(log, window, document, adLogicPageLevelParams, gptSlotConfig);
 	evolveHelper = EvolveHelper(log, window);
 
 	// Construct Ad Providers
-	adProviderAdDriver2 = AdProviderAdDriver2(wikiaDart, scriptWriter, tracker, log, window, Geo, slotTweaker, Cache, adLogicHighValueCountry, adLogicDartSubdomain, wikiaGpt);
-	adProviderGpt = AdProviderGpt(tracker, log, window, Geo, slotTweaker, Cache, adLogicHighValueCountry, wikiaFullGpt);
-	adProviderEvolve = AdProviderEvolve(adLogicPageLevelParamsLegacy, scriptWriter, tracker, log, window, document, Krux, evolveHelper, slotTweaker);
-	adProviderGamePro = AdProviderGamePro(adLogicPageLevelParamsLegacy, scriptWriter, tracker, log, window, slotTweaker);
+	adProviderDirectGpt = AdProviderDirectGpt(log, window, Geo, slotTweaker, Cache, adLogicHighValueCountry, wikiaGptHelper, gptSlotConfig);
+	adProviderEvolve = AdProviderEvolve(adLogicPageLevelParamsLegacy, scriptWriter, log, window, document, Krux, evolveHelper, slotTweaker);
 	adProviderNull = AdProviderNull(log, slotTweaker);
 
 	// Special Ad Provider, to deal with the late ads
@@ -76,14 +87,13 @@
 		window,
 		document,
 		Geo,
-		adLogicPageDimensions,
 		abTest,
 
+		adDecoratorPageDimensions,
+
 		// AdProviders:
-		adProviderAdDriver2,
-		adProviderGpt,
+		adProviderDirectGpt,
 		adProviderEvolve,
-		adProviderGamePro,
 		adProviderLater,
 		adProviderNull
 	);
@@ -98,12 +108,17 @@
 			trackingMethod: 'ad'
 		});
 		window.adslots2 = window.adslots2 || [];
-		adEngine.run(adConfig, window.adslots2);
+		adEngine.run(adConfig, window.adslots2, 'queue.early');
 	});
+
+	window.AdEngine_getTrackerStats = slotTracker.getStats;
 
 	// DART API for Liftium
 	window.LiftiumDART = {
-		getUrl: function (slotname, slotsize, a, b) {
+		getUrl: function (slotname, slotsize) {
+			if (slotsize) {
+				slotsize += ',1x1';
+			}
 			return wikiaDart.getUrl({
 				slotname: slotname,
 				slotsize: slotsize,
@@ -141,7 +156,7 @@
 				ga_label: 'adengine2 late',
 				trackingMethod: 'ad'
 			});
-			adEngine.run(adConfigForLateAds, queueForLateAds);
+			adEngine.run(adConfigForLateAds, queueForLateAds, 'queue.late');
 		} else {
 			log('ERROR, AdEngine_loadLateAds called before AdEngine_setLateConfig!', 1, module);
 			tracker.track({
@@ -154,6 +169,9 @@
 		}
 	};
 
+	if (window.wgEnableRHonDesktop) {
+		window.wgAfterContentAndJS.push(window.AdEngine_loadLateAds);
+	}
 	// Load Krux asynchronously later
 	// If you call AdEngine_loadKruxLater(Krux) at the end of the HTML Krux
 	// or on DOM ready, it will be loaded after most (if not all) of the ads
@@ -169,6 +187,17 @@
 	// Register window.wikiaDartHelper so jwplayer can use it
 	window.wikiaDartHelper = wikiaDart;
 
+	// Export page level params, so Krux can read them
+	params = adLogicPageLevelParams.getPageLevelParams();
+	for (param in params) {
+		if (params.hasOwnProperty(param)) {
+			value = params[param];
+			if (value) {
+				window['kruxDartParam_' + param] = value.toString();
+			}
+		}
+	}
+
 	// Custom ads (skins, footer, etc)
 	// TODO: loadable modules
 	window.loadCustomAd = function (params) {
@@ -183,4 +212,4 @@
 		});
 	};
 
-}(Wikia.log, Wikia.Tracker, window, ghostwriter, document, Geo, Wikia.LazyQueue, Wikia.Cookies, Wikia.Cache, Krux, Wikia.AbTest));
+}(Wikia.log, Wikia.Tracker, window, document, Geo, Wikia.LazyQueue, Wikia.Cookies, Wikia.Cache, Krux, Wikia.AbTest));

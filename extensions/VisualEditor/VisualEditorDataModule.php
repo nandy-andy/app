@@ -77,6 +77,8 @@ class VisualEditorDataModule extends ResourceLoaderModule {
 			'visualeditor-browserwarning' => array( 'visualeditor-browserwarning' ),
 			'visualeditor-report-notice' => array( 'visualeditor-report-notice' ),
 			'visualeditor-wikitext-warning' => array( 'visualeditor-wikitext-warning' ),
+			'wikia-visualeditor-wikitext-warning' => array( 'wikia-visualeditor-wikitext-warning' ),
+			'wikia-visualeditor-dialog-wikiamediainsert-policy-message' => array( 'wikia-visualeditor-dialog-wikiamediainsert-policy-message' ),
 		);
 
 		// Override message value

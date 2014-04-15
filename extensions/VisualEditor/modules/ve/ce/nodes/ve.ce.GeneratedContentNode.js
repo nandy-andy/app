@@ -17,11 +17,12 @@ ve.ce.GeneratedContentNode = function VeCeGeneratedContentNode() {
 	// Properties
 	this.generatingPromise = null;
 
-	// DOM changes
-	this.$.addClass( 've-ce-generatedContentNode' );
-
 	// Events
 	this.model.connect( this, { 'update': 'onGeneratedContentNodeUpdate' } );
+	this.connect( this, {
+		'setup': 'onGeneratedContentSetup',
+		'teardown': 'onGeneratedContentTeardown'
+	} );
 
 	// Initialization
 	this.update();
@@ -40,6 +41,13 @@ ve.ce.GeneratedContentNode = function VeCeGeneratedContentNode() {
 /**
  * @event rerender
  */
+
+/* Static members */
+
+ve.ce.GeneratedContentNode.static = {};
+
+// this.$element is just a wrapper for the real content, so don't duplicate attributes on it
+ve.ce.GeneratedContentNode.static.renderHtmlAttributes = false;
 
 /* Abstract methods */
 
@@ -78,27 +86,92 @@ ve.ce.GeneratedContentNode.prototype.onGeneratedContentNodeUpdate = function () 
 };
 
 /**
+ * Handler for the setup event
+ */
+ve.ce.GeneratedContentNode.prototype.onGeneratedContentSetup = function () {
+	this.$element.addClass( 've-ce-generatedContentNode' );
+};
+
+/**
+ * Handler for the teardown event
+ */
+ve.ce.GeneratedContentNode.prototype.onGeneratedContentTeardown = function () {
+	this.$element.removeClass( 've-ce-generatedContentNode' );
+	this.abortGenerating();
+};
+
+/**
+ * Make an array of DOM elements suitable for rendering.
+ *
+ * Subclasses can override this to provide their own cleanup steps. This function takes an
+ * array of DOM elements cloned within the source document and returns an array of DOM elements
+ * cloned into the target document. If it's important that the DOM elements still be associated
+ * with the original document, you should modify domElements before calling the parent
+ * implementation, otherwise you should call the parent implementation first and modify its
+ * return value.
+ *
+ * @param {HTMLElement[]} domElements Clones of the DOM elements from the store
+ * @returns {HTMLElement[]} Clones of the DOM elements in the right document, with modifications
+ */
+ve.ce.GeneratedContentNode.prototype.getRenderedDomElements = function ( domElements ) {
+	var i, len, attr, $rendering,
+		doc = this.getElementDocument();
+
+	/**
+	 * Callback for jQuery.fn.each that resolves the value of attr to the computed
+	 * property value. Called in the context of an HTMLElement.
+	 * @private
+	 */
+	function resolveAttribute() {
+		this.setAttribute( attr, this[attr] );
+	}
+
+	// Copy domElements so we can modify the elements
+	// Filter out link, meta and style tags for bug 50043
+	$rendering = this.$( domElements ).not( 'link, meta, style' );
+	// Also remove link, meta and style tags nested inside other tags
+	$rendering.find( 'link, meta, style' ).remove();
+
+	// Render the computed values of some attributes
+	for ( i = 0, len = ve.dm.Converter.computedAttributes.length; i < len; i++ ) {
+		attr = ve.dm.Converter.computedAttributes[i];
+		$rendering.find( '[' + attr + ']' )
+			.add( $rendering.filter( '[' + attr + ']' ) )
+			.each( resolveAttribute );
+	}
+
+	// Clone the elements into the target document
+	return ve.copyDomElements( $rendering.toArray(), doc );
+};
+
+/**
  * Rerender the contents of this node.
  *
- * @param {HTMLElement[]} domElements Array of DOM elements
- * @emits setup
- * @emits teardown
- * @emits rerender
+ * @param {Object|string|Array} generatedContents Generated contents, in the default case an HTMLElement array
+ * @fires setup
+ * @fires teardown
  */
-ve.ce.GeneratedContentNode.prototype.render = function ( domElements ) {
-	var $rendering, doc = this.getElementDocument();
+ve.ce.GeneratedContentNode.prototype.render = function ( generatedContents ) {
 	if ( this.live ) {
 		this.emit( 'teardown' );
 	}
-	// Filter out link, meta and style tags for bug 50043
-	$rendering = $( ve.copyDomElements( domElements, doc ) ).not( 'link, meta, style' );
-	// Also remove link, meta and style tags nested inside other tags
-	$rendering.find( 'link, meta, style' ).remove();
-	this.$.empty().append( $rendering );
+	this.$element.empty().append( this.getRenderedDomElements( ve.copyDomElements( generatedContents ) ) );
 	if ( this.live ) {
 		this.emit( 'setup' );
-		this.emit( 'rerender' );
+		this.afterRender( generatedContents );
 	}
+};
+
+/**
+ * Trigger rerender events after rendering the contents of the node.
+ *
+ * Nodes may override this method if the rerender event needs to be deferred (e.g. until images have loaded)
+ *
+ * @param {Object|string|Array} generatedContents Generated contents
+ * @fires rerender
+ */
+ve.ce.GeneratedContentNode.prototype.afterRender = function () {
+	this.emit( 'rerender' );
 };
 
 /**
@@ -109,11 +182,11 @@ ve.ce.GeneratedContentNode.prototype.render = function ( domElements ) {
  */
 ve.ce.GeneratedContentNode.prototype.update = function ( config ) {
 	var store = this.model.doc.getStore(),
-		index = store.indexOfHash( ve.getHash( [ this.model, config ] ) );
+		index = store.indexOfHash( OO.getHash( [ this.model, config ] ) );
 	if ( index !== null ) {
 		this.render( store.value( index ) );
 	} else {
-		this.forceUpdate();
+		this.forceUpdate( config );
 	}
 };
 
@@ -124,17 +197,12 @@ ve.ce.GeneratedContentNode.prototype.update = function ( config ) {
  */
 ve.ce.GeneratedContentNode.prototype.forceUpdate = function ( config ) {
 	var promise, node = this;
+
 	if ( this.generatingPromise ) {
 		// Abort the currently pending generation process if possible
-		// Unset this.generatingPromise first so that if the promise is resolved or rejected
-		// when we abort, this is ignored as it should be
-		promise = this.generatingPromise;
-		this.generatingPromise = null;
-		if ( $.isFunction( promise.abort ) ) {
-			promise.abort();
-		}
+		this.abortGenerating();
 	} else {
-		// Only call startGenerating() if we weren't generating before
+		// Only call startGenerating if we weren't generating before
 		this.startGenerating();
 	}
 
@@ -142,9 +210,9 @@ ve.ce.GeneratedContentNode.prototype.forceUpdate = function ( config ) {
 	promise = this.generatingPromise = this.generateContents( config );
 	promise
 		// If this promise is no longer the currently pending one, ignore it completely
-		.done( function ( domElements ) {
+		.done( function ( generatedContents ) {
 			if ( node.generatingPromise === promise ) {
-				node.doneGenerating( domElements, config );
+				node.doneGenerating( generatedContents, config );
 			}
 		} )
 		.fail( function () {
@@ -164,23 +232,49 @@ ve.ce.GeneratedContentNode.prototype.forceUpdate = function ( config ) {
  * @method
  */
 ve.ce.GeneratedContentNode.prototype.startGenerating = function () {
-	// TODO: add 'generating' style
+	this.$element.addClass( 've-ce-generatedContentNode-generating' );
+};
+
+/**
+ * Abort the currently pending generation, if any, and remove the generating CSS class.
+ *
+ * This invokes .abort() on the pending promise if the promise has that method. It also ensures
+ * that if the promise does get resolved or rejected later, this is ignored.
+ */
+ve.ce.GeneratedContentNode.prototype.abortGenerating = function () {
+	var promise = this.generatingPromise;
+	if ( promise ) {
+		// Unset this.generatingPromise first so that if the promise is resolved or rejected
+		// from within .abort(), this is ignored as it should be
+		this.generatingPromise = null;
+		if ( $.isFunction( promise.abort ) ) {
+			promise.abort();
+		}
+	}
+	this.$element.removeClass( 've-ce-generatedContentNode-generating' );
 };
 
 /**
  * Called when the node successfully finishes generating new content.
  *
  * @method
- * @param {HTMLElement[]} domElements Generated content
+ * @param {Object|string|Array} generatedContents Generated contents
  * @param {Object} [config] Config object passed to forceUpdate()
  */
-ve.ce.GeneratedContentNode.prototype.doneGenerating = function ( domElements, config ) {
-	var store = this.model.doc.getStore(),
-		hash = ve.getHash( [ this.model, config ] );
-	store.index( domElements, hash );
-	// TODO: remove 'generating' style
+ve.ce.GeneratedContentNode.prototype.doneGenerating = function ( generatedContents, config ) {
+	var store, hash;
+
+	// Because doneGenerating is invoked asynchronously, the model node may have become detached
+	// in the meantime. Handle this gracefully.
+	if ( this.model.doc ) {
+		store = this.model.doc.getStore();
+		hash = OO.getHash( [ this.model, config ] );
+		store.index( generatedContents, hash );
+	}
+
+	this.$element.removeClass( 've-ce-generatedContentNode-generating' );
 	this.generatingPromise = null;
-	this.render( domElements );
+	this.render( generatedContents );
 };
 
 /**
@@ -189,6 +283,6 @@ ve.ce.GeneratedContentNode.prototype.doneGenerating = function ( domElements, co
  * @method
  */
 ve.ce.GeneratedContentNode.prototype.failGenerating = function () {
-	// TODO: remove 'generating' style
+	this.$element.removeClass( 've-ce-generatedContentNode-generating' );
 	this.generatingPromise = null;
 };

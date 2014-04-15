@@ -14,9 +14,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onFileUpload( $file, $reupload, $hasDescription ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		$videoInfoHelper = new VideoInfoHelper();
 		$videoData = $videoInfoHelper->getVideoDataFromFile( $file );
@@ -37,6 +34,9 @@ class VideoInfoHooksHelper {
 				if ( !$file->isLocal() ) {
 					$mediaService->clearCacheTotalPremiumVideos();
 				}
+				if ( !empty( F::app()->wg->UseVideoVerticalFilters ) ) {
+					VideoInfoHooksHelper::clearCategories( $file->getTitle() );
+				}
 			}
 		}
 
@@ -49,9 +49,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onAddPremiumVideo( $title ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		if ( $title instanceof Title ) {
 			$videoInfoHelper = new VideoInfoHelper();
@@ -85,9 +82,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onRemovePremiumVideo( $title ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		if ( $title instanceof Title ) {
 			$videoInfo = VideoInfo::newFromTitle( $title->getDBKey() );
@@ -120,9 +114,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onArticleSaveComplete(&$article, &$user, $text, $summary, $minoredit, $watchthis, $sectionanchor, &$flags, $revision, &$status, $baseRevId) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		$insertedImages = Wikia::getVar( 'imageInserts' );
 
@@ -156,9 +147,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onFileDeleteComplete( &$file, $oldimage, $article, $user, $reason ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		if ( WikiaFileHelper::isFileTypeVideo($file) ) {
 			if ( $file->isLocal() ) {
@@ -185,9 +173,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onFileUndeleteComplete( $title, $versions, $user, $comment ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		$videoInfoHelper = new VideoInfoHelper();
 		$videoInfo = $videoInfoHelper->getVideoInfoFromTitle( $title );
@@ -209,9 +194,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onFileRenameComplete( &$form , &$oldTitle , &$newTitle ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		$videoInfoHelper = new VideoInfoHelper();
 		$affected = $videoInfoHelper->renameVideo( $oldTitle, $newTitle );
@@ -232,9 +214,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onArticleDeleteComplete( &$wikiPage, &$user, $reason, $pageId  ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		$title = $wikiPage->getTitle();
 		if ( $title instanceof Title && $title->getNamespace() == NS_FILE ) {
@@ -272,9 +251,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onUndeleteComplete( &$title, &$user, $reason ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		if ( $title instanceof Title && $title->getNamespace() == NS_FILE ) {
 			$videoInfoHelper = new VideoInfoHelper();
@@ -296,9 +272,6 @@ class VideoInfoHooksHelper {
 	 * @return true
 	 */
 	public static function onForeignFileDeleted( $file, &$isDeleted ) {
-		if ( !VideoInfoHelper::videoInfoExists() ) {
-			return true;
-		}
 
 		// Only report this file as deleted when this request is coming from a file page.  In other
 		// instances (search results from the WVL for example) we want to make sure these videos still appear.
@@ -318,4 +291,103 @@ class VideoInfoHooksHelper {
 
 		return true;
 	}
+
+	/**
+	 * Check the file passed and fail if its a ghost file; that is, a file
+	 * that is from the video wiki but doesn't have any local record
+	 *
+	 * @param File $file A file object to check
+	 * @return bool Whether this hook has succeeded
+	 */
+	public static function onCheckGhostFile( &$file ) {
+		# If we're on a file page and we don't have any video_info for the current
+		# title, treat it like a non-existent file
+		if ( $file && WikiaFileHelper::isFileTypeVideo($file) ) {
+			$title = $file->getTitle()->getDBkey();
+			$info = VideoInfo::newFromTitle( $title );
+			if ( empty($info) ) {
+				F::app()->wg->IsGhostVideo = true;
+				$file = null;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Hook: Clear total videos by category cache when video is deleted, after checking if it was associated with
+	 * one of the categories filtered in Special Videos.
+	 * @param $wikiPage
+	 * @param User $user
+	 * @param $reason
+	 * @param $error
+	 * @return true
+	 */
+	public static function onArticleDelete( &$wikiPage, User &$user, &$reason, &$error ) {
+
+		$title = $wikiPage->getTitle();
+
+		if ( $title instanceof Title && WikiaFileHelper::isFileTypeVideo( $title ) ) {
+			VideoInfoHooksHelper::clearCategories( $title );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Hook: Clear total videos by category cache when video is updated, after checking if it was associated with
+	 * one of the categories filtered in Special Videos.
+	 * @param $article
+	 * @param $sectionanchor
+	 * @param $extraq
+	 * @return true
+	 */
+	public static function onArticleUpdateBeforeRedirect( $article, &$sectionanchor, &$extraq ) {
+
+		$title = $article->getTitle();
+
+		if ( $title instanceof Title && WikiaFileHelper::isFileTypeVideo( $title ) ) {
+			VideoInfoHooksHelper::clearCategories( $title );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Clear total videos by category cache when video categories are added via the Category Select extension,
+	 * after checking if it was associated with one of the categories filtered in Special Videos.
+	 * @param $title
+	 * @param $categories
+	 * @return true
+	 */
+	public static function onCategorySelectSave( $title, $categories ) {
+
+		if ( $title instanceof Title && WikiaFileHelper::isFileTypeVideo( $title ) ) {
+			VideoInfoHooksHelper::clearCategories( $title );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get all categories associated with a given video, compare them with the categories we're using as filters
+	 * on the Special:Videos page, and clear the cache for total videos in categories which match.
+	 * @param $title
+	 * @param null||array $categories
+	 */
+	private static function clearCategories( $title, $categories = null ) {
+		if ( is_null( $categories ) ) {
+			$categories = array_map(
+				function( $category ) { return explode( ":", $category )[1]; },
+				array_keys( $title->getParentCategories() ) );
+		}
+
+		$helper = new MediaQueryService();
+		foreach ( $categories as $category ) {
+			if ( in_array( $category, SpecialVideosHelper::$verticalCategoryFilters ) ) {
+				$helper->clearCacheTotalVideosByCategory( $category );
+			}
+		}
+	}
+
 }

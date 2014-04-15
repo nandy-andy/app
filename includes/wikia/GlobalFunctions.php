@@ -110,58 +110,51 @@ function print_pre($param, $return = 0)
  * @return String -- new url
  */
 function wfReplaceImageServer( $url, $timestamp = false ) {
-	global $wgImagesServers, $wgAkamaiLocalVersion,  $wgAkamaiGlobalVersion, $wgDevBoxImageServerOverride, $wgDBname;
+	$wg = F::app()->wg;
 
 	// Override image server location for Wikia development environment
 	// This setting should be images.developerName.wikia-dev.com or perhaps "localhost"
-	if (!empty($wgDevBoxImageServerOverride)) {
-		$url = preg_replace("/\/\/(.*?)wikia-dev\.com\/(.*)/", "//$wgDevBoxImageServerOverride/$2", $url);
+	if (!empty($wg->DevBoxImageServerOverride)) {
+		$url = preg_replace("/\/\/(.*?)wikia-dev\.com\/(.*)/", "//{$wg->DevBoxImageServerOverride}/$2", $url);
 	}
 
 	wfDebug( __METHOD__ . ": requested url $url\n" );
-	if(substr(strtolower($url), -4) != '.ogg' && isset($wgImagesServers) && is_int($wgImagesServers)) {
+	if(substr(strtolower($url), -4) != '.ogg' && isset($wg->ImagesServers) && is_int($wg->ImagesServers)) {
 		if(strlen($url) > 7 && substr($url,0,7) == 'http://') {
 			$hash = sha1($url);
 			$inthash = ord ($hash);
 
-			$serverNo = $inthash%($wgImagesServers-1);
+			$serverNo = $inthash%($wg->ImagesServers-1);
 			$serverNo++;
 
 			// If there is no timestamp, use the cache-busting number from wgCdnStylePath.
 			if($timestamp == ""){
-				global $wgCdnStylePath;
 				$matches = array();
-				if(0 < preg_match("/\/__cb([0-9]+)/i", $wgCdnStylePath, $matches)){
+				// @TODO: consider using wgStyleVersion
+				if(0 < preg_match("/\/__cb([0-9]+)/i", $wg->CdnStylePath, $matches)){
 					$timestamp = $matches[1];
 				} else {
 					// This results in no caching of the image.  Bad bad bad, but the best way to fail.
 					Wikia::log( __METHOD__, "", "BAD FOR CACHING!: There is a call to ".__METHOD__." without a timestamp and we could not parse a fallback cache-busting number out of wgCdnStylePath.  This means the '{$url}' image won't be cacheable!");
 					$timestamp = rand(0, 1000);
 				}
-			} else if(strtotime($timestamp) > strtotime("now -10 minute")){
-				// To prevent a race-condition, if the image is less than 10 minutes old, don't use cb-value.
-				// This will cause Akamai to only cache for 30 seconds.
-				$timestamp = "";
-			}
-			// Add Akamai versions, but only if there is some sort of caching number.
-			if($timestamp != ""){
-				$timestamp += $wgAkamaiGlobalVersion + $wgAkamaiLocalVersion;
 			}
 
-			// NOTE: This should be the only use of the cache-buster which does not use $wgCdnStylePath.
+			// NOTE: This should be the only use of the cache-buster which does not use $wg->CdnStylePath.
 			// RT#98969 if the url already has a cb value, don't add another one...
 			$cb = ($timestamp!='' && strpos($url, "__cb") === false) ? "__cb{$timestamp}/" : '';
 
-			if (!empty($wgDevBoxImageServerOverride)) {
+			if (!empty($wg->DevBoxImageServerOverride)) {
 				// Dev boxes
-				$url = str_replace('http://images.wikia.com/', sprintf("http://$wgDevBoxImageServerOverride/%s", $cb), $url);
+				// TODO: support domains sharding on devboxes
+				$url = str_replace('http://images.wikia.com/', sprintf("http://{$wg->DevBoxImageServerOverride}/%s", $cb), $url);
 			} else {
 				// Production
-				$url = str_replace('http://images.wikia.com/', sprintf("http://images%s.wikia.nocookie.net/%s",$serverNo, $cb), $url);
+				$url = str_replace('http://images.wikia.com/', sprintf("http://{$wg->ImagesDomainSharding}/%s",$serverNo, $cb), $url);
 			}
 		}
-	} else if (!empty($wgDevBoxImageServerOverride)) {
-		$url = str_replace('http://images.wikia.com/', "http://$wgDevBoxImageServerOverride/", $url);
+	} else if (!empty($wg->DevBoxImageServerOverride)) {
+		$url = str_replace('http://images.wikia.com/', "http://{$wg->DevBoxImageServerOverride}/", $url);
 	}
 
 	return $url;
@@ -176,9 +169,10 @@ function wfReplaceImageServer( $url, $timestamp = false ) {
  * @return string URL after applying domain sharding
  */
 function wfReplaceAssetServer( $url ) {
-	global $wgImagesServers;
+	global $wgImagesServers, $wgDevelEnvironment;
 
 	$matches = array();
+
 	if ( preg_match("#^(?<a>(https?:)?//(slot[0-9]+\\.)?images)(?<b>\\.wikia\\.nocookie\\.net/.*)\$#",$url,$matches) ) {
 		$hash = sha1($url);
 		$inthash = ord($hash);
@@ -187,7 +181,14 @@ function wfReplaceAssetServer( $url ) {
 		$serverNo++;
 
 		$url = $matches['a'] . ($serverNo) . $matches['b'];
+	} elseif (!empty($wgDevelEnvironment) && preg_match('/^((https?:)?\/\/)(([a-z0-9]+)\.wikia-dev\.com\/(.*))$/', $url, $matches)) {
+		$hash = sha1($url);
+		$inthash = ord($hash);
 
+		$serverNo = $inthash%($wgImagesServers-1);
+		$serverNo++;
+
+		$url = "{$matches[1]}i{$serverNo}.{$matches[3]}";
 	}
 
 	return $url;
@@ -1788,4 +1789,65 @@ function wfGetNamespaces() {
 	wfRunHooks( 'XmlNamespaceSelectorAfterGetFormattedNamespaces', array(&$namespaces) );
 
 	return $namespaces;
+}
+
+/**
+ * Repair malformed HTML without making semantic changes (ie, changing tags to more closely follow the HTML spec.)
+ * Refs DAR-985 and VID-1011
+ *
+ * @param string $html - HTML to repair
+ * @return string - repaired HTML
+ */
+function wfFixMalformedHTML( $html ) {
+	$domDocument = new DOMDocument();
+
+	// Silence errors when loading html into DOMDocument (it complains when receiving malformed html - which is
+	// what we're using it to fix) see: http://www.php.net/manual/en/domdocument.loadhtml.php#95463
+	libxml_use_internal_errors( true );
+
+	// Make sure loadHTML knows that text is utf-8 (it assumes ISO-88591)
+	// CONN-130 - Added <!DOCTYPE html> to allow HTML5 tags in the article comment
+	$htmlHeader = '<!DOCTYPE html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"></head>';
+	$domDocument->loadHTML( $htmlHeader . $html );
+
+	// Strip doctype declaration, <html>, <body> tags created by saveHTML, as well as <meta> tag added to
+	// to html above to declare the charset as UTF-8
+	$html = preg_replace(
+		array(
+			'/^.*?<body>/si', '/^.*?charset=utf-8">/si',
+			'/<\/body><\/html>$/si',
+			'/<\/head><\/html>$/si',
+		),
+		'',
+		$domDocument->saveHTML()
+	);
+
+	return $html;
+}
+
+/**
+ * Go through the backtrace and return the first method that is not in the ingored class
+ * @param $ignoreClasses mixed array of ignored class names or a single class name
+ * @return string method name
+ */
+function wfGetCallerClassMethod( $ignoreClasses ) {
+	// analyze the backtrace to log the source of purge requests
+	$backtrace = wfDebugBacktrace();
+	$method = '';
+
+	if ( is_string( $ignoreClasses ) ) {
+		$ignoreClasses = [ $ignoreClasses ];
+	}
+
+	while ( $entry = array_shift( $backtrace ) ) {
+
+		if ( empty( $entry['class'] ) || in_array( $entry['class'], $ignoreClasses ) ) {
+			continue;
+		}
+
+		$method = $entry['class'] . ':' . $entry['function'];
+		break;
+	}
+
+	return $method;
 }

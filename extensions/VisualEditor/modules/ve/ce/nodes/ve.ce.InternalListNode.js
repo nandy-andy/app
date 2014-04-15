@@ -12,19 +12,19 @@
  * @extends ve.ce.BranchNode
  * @constructor
  * @param {ve.dm.InternalListNode} model Model to observe
- * @param {Object} [config] Config options
+ * @param {Object} [config] Configuration options
  */
 ve.ce.InternalListNode = function VeCeInternalListNode( model, config ) {
 	// Parent constructor
 	ve.ce.BranchNode.call( this, model, config );
 
 	// An internal list has no rendering
-	this.$ = $( [] );
+	this.$element = this.$( [] );
 };
 
 /* Inheritance */
 
-ve.inheritClass( ve.ce.InternalListNode, ve.ce.BranchNode );
+OO.inheritClass( ve.ce.InternalListNode, ve.ce.BranchNode );
 
 /* Static Properties */
 

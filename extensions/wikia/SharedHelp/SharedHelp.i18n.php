@@ -54,6 +54,7 @@ $messages['br'] = array(
 	'sharedhelp-desc' => "Kemer a ra pajennoù [[w:c:Help|skoazell Wikia]] hag ensoc'hañ a ra anezho en esaouenn anv {{ns:help}} eus ar wiki-mañ",
 	'sharedhelp-autotalkcreate-summary' => 'Pajenn gaozeal krouet ent emgefreek',
 	'sharedhelp-searchprofile' => 'Pajennoù skoazell',
+	'sharedhelp-searchprofile-tooltip' => 'Furchal ar pajennoù skoazell',
 );
 
 /** Catalan (català)
@@ -66,7 +67,7 @@ $messages['ca'] = array(
 	'sharedhelp-searchprofile-tooltip' => "Cercar pàgines d'ajuda",
 );
 
-/** Czech (česky)
+/** Czech (čeština)
  * @author Darth Daron
  * @author Mormegil
  */
@@ -110,11 +111,14 @@ $messages['es'] = array(
 );
 
 /** Finnish (suomi)
+ * @author Elseweyr
  * @author Ilkea
  */
 $messages['fi'] = array(
 	'sharedhelp-desc' => 'Ottaa sivut[[w:c:Help|Help Wikiasta]] ja liittää ne {{ns:help}} nimiavaruuteen tässä wikissä',
 	'sharedhelp-autotalkcreate-summary' => 'Keskustelusivu luotiin automaattisesti',
+	'sharedhelp-searchprofile' => 'Ohjesivut',
+	'sharedhelp-searchprofile-tooltip' => 'Etsi ohjesivuja',
 );
 
 /** French (français)
@@ -289,7 +293,7 @@ $messages['pms'] = array(
  * @author Ahmed-Najib-Biabani-Ibrahimkhel
  */
 $messages['ps'] = array(
-	'sharedhelp-autotalkcreate-summary' => 'د خبرو اترو مخ په خپلکاره توګه جوړ شو',
+	'sharedhelp-autotalkcreate-summary' => 'د خبرو اترو مخ په خپلکاره توگه جوړ شو',
 );
 
 /** Portuguese (português)
@@ -300,6 +304,7 @@ $messages['pt'] = array(
 	'sharedhelp-desc' => 'Insere páginas da [[w:c:Help|Help Wikia]] no espaço nominal {{ns:help}} desta wiki',
 	'sharedhelp-autotalkcreate-summary' => 'Página de discussão criada automaticamente',
 	'sharedhelp-searchprofile' => 'Páginas de ajuda',
+	'sharedhelp-searchprofile-tooltip' => 'Pesquisar nas páginas de ajuda',
 );
 
 /** Brazilian Portuguese (português do Brasil)
@@ -367,6 +372,16 @@ $messages['uk'] = array(
 	'sharedhelp-searchprofile-tooltip' => 'Пошук у довідці',
 );
 
+/** Vietnamese (Tiếng Việt)
+ * @author Baonguyen21022003
+ */
+$messages['vi'] = array(
+	'sharedhelp-desc' => 'Mất trang từ [[w:c:Help|Giúp Wikia]] và chèn chúng vào không gian tên {{ns:help}} wiki này',
+	'sharedhelp-autotalkcreate-summary' => 'Thảo luận trang tự động tạo ra',
+	'sharedhelp-searchprofile' => 'Trang trợ giúp',
+	'sharedhelp-searchprofile-tooltip' => 'Trang trợ giúp tìm kiếm',
+);
+
 /** Simplified Chinese (中文（简体）‎)
  * @author Dimension
  * @author Hydra
@@ -377,4 +392,14 @@ $messages['zh-hans'] = array(
 	'sharedhelp-autotalkcreate-summary' => '讨论页已自动创建',
 	'sharedhelp-searchprofile' => '帮助页面',
 	'sharedhelp-searchprofile-tooltip' => '搜索帮助页面',
+);
+
+/** Traditional Chinese (中文（繁體）‎)
+ * @author Ffaarr
+ */
+$messages['zh-hant'] = array(
+	'sharedhelp-desc' => '自[[w:c:Help|Wikia幫助]]獲取頁面並嵌入到這個維基的 {{ns:help}}命名空間',
+	'sharedhelp-autotalkcreate-summary' => '討論頁已自動創建',
+	'sharedhelp-searchprofile' => '幫助頁面',
+	'sharedhelp-searchprofile-tooltip' => '搜尋幫助頁面',
 );

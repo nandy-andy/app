@@ -6,6 +6,7 @@
 class AdEngine2Controller extends WikiaController {
 	const ASSET_GROUP_CORE = 'oasis_shared_core_js';
 	const ASSET_GROUP_ADENGINE = 'adengine2_js';
+	const ASSET_GROUP_LIFTIUM = 'liftium_ads_js';
 
 	const AD_LEVEL_NONE = 'none';           // show no ads
 	const AD_LEVEL_LIMITED = 'limited';     // show some ads (logged in users on main page)
@@ -121,7 +122,7 @@ class AdEngine2Controller extends WikiaController {
 			return self::AD_LEVEL_CORPORATE;
 		}
 
-		if (preg_match('/TOP_LEADERBOARD|TOP_RIGHT_BOXAD|GPT_FLUSH/', $slotname)) {
+		if (preg_match('/TOP_LEADERBOARD|TOP_RIGHT_BOXAD|GPT_FLUSH|SEVENONEMEDIA_FLUSH/', $slotname)) {
 			return self::AD_LEVEL_LIMITED;
 		}
 		return self::AD_LEVEL_ALL;
@@ -297,10 +298,30 @@ class AdEngine2Controller extends WikiaController {
 	 */
 
 	/**
+	 * Handle URL parameters and set proper global variables early enough :)
+	 *
+	 * - Enable Remnant Dart hop instead of Liftium on Desktop ($wgEnableRHonDesktop)
+	 *
+	 * @author Sergey Naumov
+	 */
+	static public function onAfterInitialize($title, $article, $output, $user, WebRequest $request, $wiki) {
+
+		global $wgAdDriverForceDirectGptAd, $wgAdDriverForceLiftiumAd, $wgEnableRHonDesktop, $wgAdDriverEnableRemnantGptMobile;
+
+		$wgEnableRHonDesktop = $request->getBool( 'gptremnant', $wgEnableRHonDesktop );
+		$wgAdDriverEnableRemnantGptMobile = $request->getBool( 'gptremnant', $wgAdDriverEnableRemnantGptMobile );
+
+		$wgAdDriverForceDirectGptAd = $request->getBool( 'forcedirectgpt', $wgAdDriverForceDirectGptAd );
+		$wgAdDriverForceLiftiumAd = $request->getBool( 'forceliftium', $wgAdDriverForceLiftiumAd );
+
+		return true;
+	}
+
+
+	/**
 	 * Register global JS variables bottom (migrated from wfAdEngineSetupJSVars)
 	 *
 	 * @param array $vars
-	 * @param array $scripts
 	 *
 	 * @return bool
 	 */
@@ -308,11 +329,14 @@ class AdEngine2Controller extends WikiaController {
 		wfProfileIn(__METHOD__);
 
 		global $wgRequest, $wgNoExternals, $wgEnableAdsInContent, $wgEnableOpenXSPC,
-			   $wgAdDriverCookieLifetime, $wgHighValueCountries,
+			   $wgAdDriverCookieLifetime, $wgHighValueCountriesDefault,
 			   $wgUser, $wgEnableWikiAnswers, $wgAdDriverUseCookie, $wgAdDriverUseExpiryStorage,
 			   $wgEnableAdMeldAPIClient, $wgEnableAdMeldAPIClientPixels,
 			   $wgLoadAdDriverOnLiftiumInit, $wgOutboundScreenRedirectDelay,
-			   $wgEnableOutboundScreenExt;
+			   $wgEnableOutboundScreenExt, $wgAdDriverUseSevenOneMedia,
+			   $wgAdPageLevelCategoryLangs, $wgAdPageLevelCategoryLangsDefault, $wgAdDriverTrackState,
+			   $wgAdDriverForceDirectGptAd, $wgAdDriverForceLiftiumAd,
+			   $wgEnableRHonDesktop, $wgOut, $wgCityId;
 
 		$wgNoExternals = $wgRequest->getBool('noexternals', $wgNoExternals);
 
@@ -333,11 +357,25 @@ class AdEngine2Controller extends WikiaController {
 
 		// AdDriver
 		$vars['wgAdDriverCookieLifetime'] = $wgAdDriverCookieLifetime;
-		$highValueCountries = WikiFactory::getVarValueByName('wgHighValueCountries', 177);	// community central
-		if (empty($highValueCountries)) {
-			$highValueCountries = $wgHighValueCountries;
+
+		$vars['wgHighValueCountries'] = WikiFactory::getVarValueByName(
+			'wgHighValueCountries',
+			[$wgCityId, Wikia::COMMUNITY_WIKI_ID],
+			false,
+			$wgHighValueCountriesDefault
+		);
+
+		$pageLevelCategoryLanguages = $wgAdPageLevelCategoryLangs;
+		if (empty($pageLevelCategoryLanguages)) {
+			// If the variable is not set for given wiki, use the value from the community wiki
+			$pageLevelCategoryLanguages = WikiFactory::getVarValueByName('wgAdPageLevelCategoryLangs', Wikia::COMMUNITY_WIKI_ID);
 		}
-		$vars['wgHighValueCountries'] = $highValueCountries;
+		if (empty($pageLevelCategoryLanguages)) {
+			// If the variable is set nor for given wiki neither for community, use the default value
+			$pageLevelCategoryLanguages = $wgAdPageLevelCategoryLangsDefault;
+		}
+
+		$vars['wgAdPageLevelCategoryLangs'] = $pageLevelCategoryLanguages;
 
 		if (!empty($wgAdDriverUseExpiryStorage)) {
 			$vars["wgAdDriverUseExpiryStorage"] = $wgAdDriverUseExpiryStorage;
@@ -347,6 +385,10 @@ class AdEngine2Controller extends WikiaController {
 		}
 		if (!empty($wgLoadAdDriverOnLiftiumInit)) {
 			$vars['wgLoadAdDriverOnLiftiumInit'] = $wgLoadAdDriverOnLiftiumInit;
+		}
+		if (!empty($wgAdDriverUseSevenOneMedia)) {
+			$vars['wgAdDriverUseSevenOneMedia'] = $wgAdDriverUseSevenOneMedia;
+			$vars['wgAdDriverSevenOneMediaCombinedUrl'] = ResourceLoader::makeCustomURL($wgOut, ['wikia.ext.adengine.sevenonemedia'], 'scripts');
 		}
 
 		if ($wgUser->getOption('showAds')) {
@@ -365,6 +407,22 @@ class AdEngine2Controller extends WikiaController {
 			$vars['wgEnableOutboundScreenExt'] = $wgEnableOutboundScreenExt;
 		}
 
+		if (!empty($wgAdDriverTrackState)) {
+			$vars['wgAdDriverTrackState'] = $wgAdDriverTrackState;
+        }
+
+		if (!empty($wgEnableRHonDesktop)) {
+			$vars['wgEnableRHonDesktop'] = $wgEnableRHonDesktop;
+		}
+
+		if (!empty($wgAdDriverForceDirectGptAd)) {
+			$vars['wgAdDriverForceDirectGptAd'] = $wgAdDriverForceDirectGptAd;
+		}
+
+		if (!empty($wgAdDriverForceLiftiumAd)) {
+			$vars['wgAdDriverForceLiftiumAd'] = $wgAdDriverForceLiftiumAd;
+		}
+
 		wfProfileOut(__METHOD__);
 		return true;
 	}
@@ -378,13 +436,15 @@ class AdEngine2Controller extends WikiaController {
 	 * @return bool
 	 */
 	static public function onWikiaSkinTopScriptsLegacy(&$vars, &$scripts) {
-		global $wgCityId, $wgEnableKruxTargeting, $wgNoExternals;
+		global $wgCityId, $wgEnableKruxTargeting, $wgNoExternals, $wgEnableWikiaHomePageExt;
 
 		wfProfileIn(__METHOD__);
 
 		// generic type of page: forum/search/article/home/...
 		$vars['wikiaPageType'] = WikiaPageType::getPageType();
 		$vars['wikiaPageIsHub'] = WikiaPageType::isWikiaHub();
+		$vars['wikiaPageIsWikiaHomePage'] = WikiaPageType::isWikiaHomePage();
+		$vars['wikiaPageIsCorporate'] = WikiaPageType::isCorporatePage();
 
 		// category/hub
 		$catInfo = HubService::getComscoreCategory($wgCityId);
@@ -425,10 +485,9 @@ class AdEngine2Controller extends WikiaController {
 		$vars['wgAdsShowableOnPage'] = self::areAdsShowableOnPage();
 		$vars['wgShowAds'] = self::areAdsShowableOnPage();
 
-		$vars['wgAdDriverUseFullGpt'] = $req->getBool('usefullgpt', (bool) $wg->AdDriverUseFullGpt);
-		$vars['wgAdDriverUseNewGptZones'] = $req->getBool('usenewgptzones', (bool) $wg->AdDriverUseNewGptZones);
 		$vars['wgAdVideoTargeting'] = $req->getBool('videotargeting', (bool) $wg->AdVideoTargeting);
 		$vars['wgAdDriverStartLiftiumOnLoad'] = $req->getBool('liftiumonload', (bool) $wg->LiftiumOnLoad);
+		$vars['wgUsePostScribe'] = $req->getBool('usepostscribe', false);
 
 		// Used to hop by DART ads
 		$vars['adDriverLastDARTCallNoAds'] = array();
@@ -458,6 +517,8 @@ class AdEngine2Controller extends WikiaController {
 	 * @return bool
 	 */
 	static public function onOasisSkinAssetGroups(&$jsAssets) {
+		global $wgEnableRHonDesktop;
+
 		$coreGroupIndex = array_search(self::ASSET_GROUP_CORE, $jsAssets);
 		if ($coreGroupIndex === false) {
 			// Do nothing. oasis_shared_core_js must be present for ads to work
@@ -467,6 +528,10 @@ class AdEngine2Controller extends WikiaController {
 		if (!self::areAdsInHead()) {
 			// Add ad asset to JavaScripts loaded on bottom (with regular JavaScripts)
 			array_splice($jsAssets, $coreGroupIndex + 1, 0, self::ASSET_GROUP_ADENGINE);
+		}
+
+		if ($wgEnableRHonDesktop === false) {
+			$jsAssets[] = self::ASSET_GROUP_LIFTIUM;
 		}
 		return true;
 	}

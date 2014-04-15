@@ -14,16 +14,21 @@ $messages['en'] = array(
 	'wikiahome-page-header-create-wiki-button-destination' => 'http://www.wikia.com/Special:CreateWiki',
 
 	'wikiahome-visualisation-remix-mixitup' => 'Mix it up!',
-	'wikiahome-visualisation-remix-mixituptext' => 'Thousands of wikis are at your fingertips. Remix to explore even more wikis.',
+	'wikiahome-visualisation-remix-mixituptext' => 'Thousands of communities at your fingertips. Remix to explore Wikia.',
 	'wikiahome-visualisation-remix-button' => 'Remix',
 
 	'wikiahome-stats-heading' => 'Collaboration in action',
 	'wikiahome-stats-visitors' => 'Monthly visitors',
+	'wikiahome-stats-visitors-tooltip' => 'Monthly Visitors is based on Quantcast\'s Global "People" metric which is composed of online and mobile web.',
 	'wikiahome-stats-mobile-visitors' => 'Monthly mobile visitors',
+	'wikiahome-stats-mobile-percentage' => '% Mobile Visitors',
+	'wikiahome-stats-mobile-percentage-value' => '$1%',
 	'wikiahome-stats-edits' => 'Changes today',
 	'wikiahome-stats-communities' => 'Total Communities',
 	'wikiahome-stats-new-communities' => 'Communities today',
 	'wikiahome-stats-totalpages' => 'Total Pages',
+
+	'wikiahome-hubs-slot-more-in-heading' => 'More in $1',
 
 	'wikia-home-page-preview' => 'Preview',
 	'wikia-home-page-visit' => 'Visit',
@@ -99,7 +104,6 @@ __NOEDITSECTION__',
 	'wikiahome-footer-everywhere' => '===Wikia Everywhere===
 *[http://www.wikia.com/Mobile Wikia Mobile]
 *[http://www.wikia.com/Mobile/GameGuides Video Game Apps]
-*[http://www.wikia.com/Mobile/PhotoPop Entertainment Apps]
 *[http://api.wikia.com/wiki/Wikia_API_Wiki API]
 __NOEDITSECTION__',
 	'wikiahome-footer-partner' => "===Partner===
@@ -137,16 +141,21 @@ $messages['de'] = array(
 	'wikiahome-page-header-create-wiki-button' => 'Starte ein Wiki',
 	'wikiahome-page-header-create-wiki-button-destination' => 'http://www.wikia.com/Special:CreateWiki?uselang=de',
 	'wikiahome-visualisation-remix-mixitup' => 'Tauche ein!',
-	'wikiahome-visualisation-remix-mixituptext' => 'Tausende von Wikis auf einen Klick. Drücke auf Remix, um noch viel mehr Wikis zu erkunden.',
+	'wikiahome-visualisation-remix-mixituptext' => 'Tausende von Wikis auf einen Klick. Drücke auf Remix, um noch mehr von Wikia zu erkunden.',
 	'wikiahome-visualisation-remix-button' => 'Remix',
 
 	'wikiahome-stats-heading' => 'Interaktive Zusammenarbeit',
 	'wikiahome-stats-visitors' => 'Monatliche Besucher',
+	'wikiahome-stats-visitors-tooltip' => 'Die Anzahl der monatlichen Besucher basiert auf der "Globalen Besucher" Metrik von Quantcast, bestehend aus Desktop und Mobilem Internet.',
+
 	'wikiahome-stats-edits' => 'Änderungen heute',
 	'wikiahome-stats-communities' => 'Anzahl Communities',
 	'wikiahome-stats-totalpages' => 'Seiten gesamt',
 	'wikiahome-stats-mobile-visitors' => 'Von mobilen Geräten',
 	'wikiahome-stats-new-communities' => 'Neue Wikis heute',
+
+	'wikiahome-stats-mobile-percentage' => '% Besucher von mobilen Geräten',
+	'wikiahome-stats-mobile-percentage-value' => '$1%',
 
 	'wikia-home-page-preview' => 'Vorschau',
 	'wikia-home-page-visit' => 'Aufrufen',
@@ -245,15 +254,19 @@ $messages['es'] = array(
 	'wikiahome-page-header-create-wiki-button-destination' => 'http://www.wikia.com/Special:CreateWiki?uselang=es',
 
 	'wikiahome-visualisation-remix-mixitup' => '¡Mézclalos!',
-	'wikiahome-visualisation-remix-mixituptext' => 'Miles de wikis están a tu alcance. Remuévelos de nuevo para explorar más wikis.',
+	'wikiahome-visualisation-remix-mixituptext' => 'Miles de comunidades están a tu alcance. Mueve la caja de comunidades para explorar Wikia.',
 	'wikiahome-visualisation-remix-button' => 'Mover',
 
 	'wikiahome-stats-heading' => 'La colaboración en acción',
 	'wikiahome-stats-visitors' => 'Visitantes mensuales',
+	'wikiahome-stats-visitors-tooltip' => 'El número de visitantes mensuales se basa en la medición de "Gente" en Quantcast, que se compone por visitas online y desde móviles.',
 	'wikiahome-stats-edits' => 'Cambios hechos hoy',
 	'wikiahome-stats-communities' => 'Comunidades en total',
 	'wikiahome-stats-totalpages' => 'Páginas en total',
 	'wikiahome-stats-mobile-visitors' => 'Desde móviles',
+	'wikiahome-stats-mobile-percentage' => '% desde móviles',
+	'wikiahome-stats-mobile-percentage-value' => '$1%',
+
 	'wikiahome-stats-new-communities' => 'Nuevas comunidades',
 
 	'wikia-home-page-preview' => 'Previsualizar',
@@ -330,7 +343,6 @@ __NOEDITSECTION__',
 	'wikiahome-footer-everywhere' => '===Wikia para todos===
 *[http://es.wikia.com/Móviles Wikia Móviles]
 *[http://es.wikia.com/Móviles/GameGuide Ap. Videojuegos]
-*[http://es.wikia.com/Móbiles/PhotoPop Ap. Entretenimiento]
 *[http://api.wikia.com/wiki/Wikia_API_Wiki API]
 __NOEDITSECTION__',
 	'wikiahome-footer-partner' => "===Publicidad===
@@ -366,16 +378,19 @@ $messages['fr'] = array(
 	'wikiahome-page-header-subheading' => 'Partagez ce que vous savez et aimez.',
 	'wikiahome-page-header-create-wiki-button' => 'Commencer un wiki',
 	'wikiahome-page-header-create-wiki-button-destination' => 'http://www.wikia.com/Special:CreateWiki?uselang=fr',
-	'wikiahome-visualisation-remix-mixitup' => 'Mélangez&nbsp;!',
-	'wikiahome-visualisation-remix-mixituptext' => 'Des centaines de wikis à votre portée. Mélangez pour explorer encore plus de wikis.',
+	'wikiahome-visualisation-remix-mixitup' => 'Mixez&nbsp;!',
+	'wikiahome-visualisation-remix-mixituptext' => 'Des centaines de communautés à votre portée. Mixez pour explorer Wikia.',
 	'wikiahome-visualisation-remix-button' => 'Mixer',
 
 	'wikiahome-stats-heading' => 'La collaboration en action',
 	'wikiahome-stats-visitors' => 'Visiteurs / mois',
+	'wikiahome-stats-visitors-tooltip' => 'Le nombre de visiteurs par mois est basé sur la mesure globale « Personnes » de Quantcast, qui est composée des accès en ligne et depuis les appareils mobiles.',
 	'wikiahome-stats-edits' => 'Modifications / jour',
 	'wikiahome-stats-communities' => 'Communautés totales',
 	'wikiahome-stats-totalpages' => 'Pages totales',
 	'wikiahome-stats-mobile-visitors' => 'Visiteurs mobiles / mois',
+	'wikiahome-stats-mobile-percentage' => '% visiteurs mobiles',
+	'wikiahome-stats-mobile-percentage-value' => '$1%',
 	'wikiahome-stats-new-communities' => 'Communautés / jour',
 
 	'wikia-home-page-preview' => 'Aperçu',
@@ -435,7 +450,6 @@ __NOEDITSECTION__',
 	'wikiahome-footer-everywhere' => '===Wikia en tous lieux===
 *[http://www.wikia.com/Mobile Wikia Mobile]
 *[http://www.wikia.com/Mobile/GameGuides Video Game Apps]
-*[http://www.wikia.com/Mobile/PhotoPop Entertainment Apps]
 *[http://api.wikia.com/wiki/Wikia_API_Wiki API]
 __NOEDITSECTION__',
 	'wikiahome-footer-partner' => "===Partenaire===
@@ -467,13 +481,16 @@ $messages['pl'] = array(
 	'wikiahome-page-header-create-wiki-button' => 'Utwórz wiki',
 	'wikiahome-page-header-create-wiki-button-destination' => 'http://www.wikia.com/Special:CreateWiki?uselang=pl',
 
-	'wikiahome-visualisation-remix-mixitup' => 'Miksuj wiki!',
-	'wikiahome-visualisation-remix-mixituptext' => 'Tysiące wiki na wyciągnięcie ręki. Kliknij, aby zobaczyć więcej.',
+	'wikiahome-visualisation-remix-mixitup' => 'Miksuj!',
+	'wikiahome-visualisation-remix-mixituptext' => 'Tysiące społeczności na wyciągnięcie ręki. Miksuj i odkrywaj Wikię.',
 	'wikiahome-visualisation-remix-button' => 'Miksuj',
 
 	'wikiahome-stats-heading' => 'Współpraca w akcji',
 	'wikiahome-stats-visitors' => 'Miesięcznych odwiedzin',
+	'wikiahome-stats-visitors-tooltip' => 'Miesięczne odwiedziny na podstawie danych Quantcast z sekcji "People", zawierających odwiedziny stacjonarne i mobilne.',
 	'wikiahome-stats-mobile-visitors' => 'Mobilnych odwiedzin',
+	'wikiahome-stats-mobile-percentage' => '% Mobilnych odwiedzin',
+	'wikiahome-stats-mobile-percentage-value' => '$1%',
 	'wikiahome-stats-edits' => 'Zmian dzisiaj',
 	'wikiahome-stats-communities' => 'Społeczności łącznie',
 	'wikiahome-stats-new-communities' => 'Społeczności dzisiaj',
@@ -553,7 +570,6 @@ __NOEDITSECTION__',
 	'wikiahome-footer-everywhere' => '===Wikia wszędzie===
 *[http://www.wikia.com/Mobile Wikia Mobilna]
 *[http://pl.wikia.com/Aplikacje_mobilne/GameGuides Video Game Apps]
-*[http://www.wikia.com/Mobile/PhotoPop Entertainment Apps]
 *[http://api.wikia.com/wiki/Wikia_API_Wiki API]
 __NOEDITSECTION__',
 	'wikiahome-footer-partner' => "===Współpraca===
@@ -585,6 +601,121 @@ __NOEDITSECTION__",
 	'wikiahome-hub-current-day' => '{{CURRENTDAY}} {{CURRENTMONTHNAME}} {{CURRENTYEAR}}',
 );
 
+$messages['ja'] = array(
+	'wikiahome-page-header-heading' => '作成。合作。独創的にする。',
+	'wikiahome-page-header-subheading' => 'あなたの知っていること、好きなことをシェアしよう',
+	'wikiahome-page-header-create-wiki-button' => 'ウィキアを始める',
+	'wikiahome-page-header-create-wiki-button-destination' => 'http://www.wikia.com/Special:CreateWiki?uselang=ja',
+
+	'wikiahome-visualisation-remix-mixitup' => 'シャッフル!',
+	'wikiahome-visualisation-remix-mixituptext' => 'ウィキア内の様々な<br/>コミュニティーを<br/>探求しよう!',
+	'wikiahome-visualisation-remix-button' => 'ミックス',
+
+	'wikiahome-stats-heading' => 'コラボ中',
+	'wikiahome-stats-visitors' => '月の訪問者',
+	'wikiahome-stats-visitors-tooltip' => '月の訪問者の数はクオントキャストのグローバル「PEOPLE」スコアで測定しており、その構成はオンラインとモバイルウェブから成り立っています。',
+	'wikiahome-stats-mobile-visitors' => 'ひと月のモバイルからの訪問者',
+	'wikiahome-stats-mobile-percentage' => 'モバイルからの訪問者',
+	'wikiahome-stats-mobile-percentage-value' => '$1%',
+	'wikiahome-stats-edits' => '本日の変更',
+	'wikiahome-stats-communities' => 'コミュニティーの合計数',
+	'wikiahome-stats-new-communities' => '本日のコミュニティー',
+	'wikiahome-stats-totalpages' => 'ページ合計数',
+
+	'wikia-home-page-preview' => 'プレビュー',
+	'wikia-home-page-visit' => '訪問',
+
+	'wikia-home-parse-source-empty-exception' => 'メディアウィキメッセージは空です。',
+	'wikia-home-parse-vertical-invalid-data' => '無効な個別データ',
+	'wikia-home-parse-wiki-too-few-parameters' => '無効なウィキデータ - パラメータが必要',
+
+	'wikiahome-hubs-videogames-heading' => 'ゲーム',
+	'wikiahome-hubs-videogames-url' => 'http://ja.wikia.com/ゲーム',
+	'wikiahome-hubs-videogames-creative' => 'ウィキアはゲームカルチャーを作り上げ基盤となる場所',
+	'wikiahome-hubs-videogames-more-heading' => '',
+	'wikiahome-hubs-videogames-more-list' => '',
+
+	'wikiahome-hubs-entertainment-heading' => 'エンターテイメント',
+	'wikiahome-hubs-entertainment-url' => 'http://ja.wikia.com/エンタテインメント',
+	'wikiahome-hubs-entertainment-creative' => 'エンターテイメントに詳しいコミュニティーから<br/>直にフレッシュな情報を得られる場所',
+	'wikiahome-hubs-entertainment-more-heading' => '',
+	'wikiahome-hubs-entertainment-more-list' => '',
+
+	'wikiahome-hubs-lifestyle-heading' => 'ライフスタイル & カルチャー',
+	'wikiahome-hubs-lifestyle-url' => 'http://ja.wikia.com/ライフスタイル',
+	'wikiahome-hubs-lifestyle-creative' => '熱狂的で情報を持っているコミュニティーを発見しよう',
+	'wikiahome-hubs-lifestyle-more-heading' => '',
+	'wikiahome-hubs-lifestyle-more-list' => '',
+
+	'wikiahome-community-column1-heading' => 'コミュニティーリソース',
+	'wikiahome-community-column1-link' => 'http://ja.community.wikia.com',
+	'wikiahome-community-column1-creative' => 'ウィキアにはあなたがコミュニティーを始め成長させる<br/>ための必要な情報が揃っています。ヒントやツール<br/>そしてニュースをチェックしてみて下さい。<br/>それでも疑問がある時は人々に訪ねることもできます。',
+	'wikiahome-community-column2-heading' => 'ウィキアの改革',
+	'wikiahome-community-column2-link' => 'http://www.wikia.com/Mobile',
+	'wikiahome-community-column2-creative' => 'ウィキアからマイウィキアとゲームガイドという<br/>公式モバイルアプリをご紹介させていただきます。<br/>それぞれのアプリにはウィキアコミュニティーユーザー<br/>によって創られた上質で生き生きとしたコンテンツを<br/>数多く見ることが出来ます。<br/>ダウンロードはこちらから。',
+	'wikiahome-community-column3-heading' => 'フォローしてね',
+	'wikiahome-community-social-wikia-blog' => 'ウィキアブログ',
+	'wikiahome-community-social-wikia-blog-link' => 'http://ja.community.wikia.com/wiki/カテゴリ:スタッフブログ',
+	'wikiahome-community-social-twitter' => 'ツイッター',
+	'wikiahome-community-social-facebook' => 'フェイスブック',
+	'wikiahome-community-social-googleplus' => 'Google+',
+
+	'wikiahome-footer-wikiainc' => '===Wikia, Inc.===
+*[http://ja.wikia.com/ウィキアについて ウィキアについて]
+*[http://ja.wikia.com/Special:Contact お問い合わせ]
+*[http://www.wikia.com/Press プレスリリース]
+__NOEDITSECTION__',
+	'wikiahome-footer-get-started-heading' => '===始めよう===
+__NOEDITSECTION__',
+	'wikiahome-footer-get-started-creative' => 'コミュニティーを見つけて<br />始めよう',
+	'wikiahome-footer-get-started-button' => 'http://www.wikia.com/Special:CreateNewWiki?uselang=ja', // FIXME: why is this in a message?! -- we need to pass there Wikia "button" class
+	'wikiahome-footer-follow-us' => '===フォローしてね===
+*[http://ja.community.wikia.com/wiki/カテゴリ:スタッフブログ スタッフブログ]
+*[https://www.facebook.com/wikia フェイスブック]
+*[https://twitter.com/wikia ツイッター]
+__NOEDITSECTION__',
+	'wikiahome-footer-community' => '===コミュニティー===
+*[http://ja.community.wikia.com コミュニティーセントラル]
+*[http://ja.community.wikia.com/wiki/ヘルプ:ユーザー権限 設立者&管理者]
+*[http://ja.wikia.com/Special:Contact サポートコンタクト]$1
+*[http://www.wikia.com/Stars ウィキア スター]
+*[http://ja.community.wikia.com/wiki/ヘルプ:コンテンツ ヘルプ]
+
+__NOEDITSECTION__',
+	'wikiahome-footer-everywhere' => '===どこでもウィキア===
+*[http://www.wikia.com/Mobile ウィキアモバイル]
+*[http://www.wikia.com/Mobile/GameGuides ゲームアプリ]
+*[http://api.wikia.com/wiki/Wikia_API_Wiki API]
+__NOEDITSECTION__',
+	'wikiahome-footer-partner' => "===パートナー===
+*[http://www.mediakit.wikia.com メディアキット]
+__NOEDITSECTION__",
+	'wikiahome-footer-community-wam' =>'*[$1 WAM スコア]',
+
+	'wikia-home-page-hot' => 'ホット',
+	'wikia-home-page-new' => 'ニュー',
+
+	'wikiahome-preview-stats-wam-empty-label' => 'WAM',
+	'wikiahome-preview-stats-wam' => "'''$1''' WAM スコア",
+	'wikiahome-preview-stats-page' => "{{PLURAL:$1|'''1''' ページ|'''$1''' ページ}}",
+	'wikiahome-preview-stats-photos' => "{{PLURAL:$1|'''1''' 画像|'''$1''' 画像}}",
+	'wikiahome-preview-stats-videos' => "{{PLURAL:$1|'''1''' 動画|'''$1''' 動画}}",
+	'wikiahome-preview-user-edits' => "{{PLURAL:$1|1 編集|$1 編集}}",
+	'wikiahome-preview-description-heading' => "$1",
+	'wikiahome-preview-admins-heading' => '管理者',
+	'wikiahome-preview-contributors-heading' => 'トップ投稿者',
+	'wikiahome-preview-user-profile-link-label' => 'ユーザープロフィールser Profile',
+	'wikiahome-preview-user-contributions-link-label' => '投稿',
+	'wikiahome-preview-go-to-wiki-label' => 'コミュニティーを見る',
+	'wikiahome-preview-error' => 'Interstitial error',
+	'wikiahome-preview-user-member-since' => " $1 からメンバー",
+
+	'wikiahome-import-script-no-description' => '詳細はありません',
+
+	'wikiahome-hub-current-day' => '{{CURRENTDAY}} {{CURRENTMONTHNAME}} {{CURRENTYEAR}}',
+);
+
+
 $messages['qqq'] = array(
 	'wikiahome-page-header-heading' => 'The page title text in H1 tag on the top of the page',
 	'wikiahome-page-header-subheading' => 'The page subtitle text in H4 tag below H1 tag',
@@ -602,6 +733,8 @@ $messages['qqq'] = array(
 	'wikiahome-stats-communities' => 'The text above number telling about our communities in total',
 	'wikiahome-stats-new-communities' => 'The text above number telling about our new communities',
 	'wikiahome-stats-totalpages' => 'The text above number telling about total pages on all our wikis',
+
+	'wikiahome-hubs-slot-more-in-heading' => 'The headline in hub section before more links connected to Hub vertical',
 
 	'wikia-home-page-preview' => 'The text on preview button; when you click the button you\'ll be presented with more detailed information about a wiki; the button is visible when you hover on a wiki image',
 	'wikia-home-page-visit' => 'The text on visit button; when you click the button you\'ll be redirected to chosen wiki; the button is visible when you hover on a wiki image',

@@ -20,9 +20,11 @@ ve.ui.IndentationAction = function VeUiIndentationAction( surface ) {
 
 /* Inheritance */
 
-ve.inheritClass( ve.ui.IndentationAction, ve.ui.Action );
+OO.inheritClass( ve.ui.IndentationAction, ve.ui.Action );
 
 /* Static Properties */
+
+ve.ui.IndentationAction.static.name = 'indentation';
 
 /**
  * List of allowed methods for the action.
@@ -30,7 +32,7 @@ ve.inheritClass( ve.ui.IndentationAction, ve.ui.Action );
  * @static
  * @property
  */
-ve.ui.IndentationAction.static.methods = ['increase', 'decrease'];
+ve.ui.IndentationAction.static.methods = [ 'increase', 'decrease' ];
 
 /* Methods */
 
@@ -186,7 +188,7 @@ ve.ui.IndentationAction.prototype.indentListItem = function ( listItem ) {
 
 	// TODO If this listItem has a child list, split&unwrap it
 
-	surfaceModel.change( null, selection );
+	surfaceModel.setSelection( selection );
 };
 
 /**
@@ -312,4 +314,4 @@ ve.ui.IndentationAction.prototype.unindentListItem = function ( listItem ) {
 
 /* Registration */
 
-ve.ui.actionFactory.register( 'indentation', ve.ui.IndentationAction );
+ve.ui.actionFactory.register( ve.ui.IndentationAction );
