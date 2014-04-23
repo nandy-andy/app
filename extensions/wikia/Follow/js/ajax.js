@@ -33,27 +33,26 @@
 				key = msg[4],
 				head = eid.replace( 'more-', '' ),
 				cTime = new Date(),
-				self = this,
 				valueKey,
 				url;
 
 			// this used to compare against undefined and null
 			// so just use non-strict comparison and check for both at the same time
-			if ( self.loadStatus[key] == null ) {
+			if ( follow.loadStatus[key] == null ) {
 				valueKey = 'count-' + head;
-				self.loadStatus[key] = {
+				follow.loadStatus[key] = {
 					loaded: wgFollowedPagesPagerLimit,
 					toload: $( '#' + valueKey ).val()
 				};
 			}
 
-			url = $( e.target ).attr( 'href' ) + '&from=' + self.loadStatus[key].loaded + '&cb=' + cTime.getTime();
+			url = $( e.target ).attr( 'href' ) + '&from=' + follow.loadStatus[key].loaded + '&cb=' + cTime.getTime();
 
 			$.ajax( {
 				url: url,
 				success: function ( data ) {
-					self.loadStatus[key].loaded += wgFollowedPagesPagerLimitAjax;
-					if ( self.loadStatus[key].loaded >= self.loadStatus[key].toload ) {
+					follow.loadStatus[key].loaded += wgFollowedPagesPagerLimitAjax;
+					if ( follow.loadStatus[key].loaded >= follow.loadStatus[key].toload ) {
 						$( e.target ).hide();
 					}
 
@@ -61,8 +60,8 @@
 					// VOLDEV-55
 					// previously only checked for mainspace, this checks for every prefixed id
 					var lis = $( '[id^="wikiafollowedpages-special-heading-"]' ).find( 'li' );
-					lis.off().hover( self.hover, self.unhover );
-					lis.find( '.ajax-unwatch' ).click( self.uwatch );
+					lis.off().hover( follow.hover, follow.unhover );
+					lis.find( '.ajax-unwatch' ).click( follow.uwatch );
 				}
 			} );
 
@@ -70,7 +69,7 @@
 		},
 
 		syncUserPrefsEvent: function( e ) {
-			this.syncUserPrefs( $( e.target ) );
+			follow.syncUserPrefs( $( e.target ) );
 		},
 
 		syncUserPrefs: function ( $target ) {
@@ -81,7 +80,7 @@
 			sync['mw-input-enotiffollowedminoredits'] = 'mw-input-enotifminoredits';
 			sync['mw-input-enotiffollowedpages'] =  'mw-input-enotifwatchlistpages';
 
-			$( '#' + sync[$target.attr( 'id' )] ).prop( 'checked', $target.attr( 'checked' ) );
+			$( '#' + sync[$target.attr( 'id' )] ).prop( 'checked', $target.prop( 'checked' ) );
 		}
 	};
 
