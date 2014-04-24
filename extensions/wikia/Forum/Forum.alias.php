@@ -19,7 +19,7 @@ $specialPageAliases['es'] = array(
 );
 
 /** Finnish (Suomi) */
-$specialPageAliases['fi'] = array )
+$specialPageAliases['fi'] = array(
 	'Forum' => array( 'Foorumi' ),
 );
 
