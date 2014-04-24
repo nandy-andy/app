@@ -18,6 +18,11 @@ $specialPageAliases['es'] = array(
 	'Forum' => array( 'Foro', 'Forum' ),
 );
 
+/** Finnish (Suomi) */
+$specialPageAliases['fi'] = array )
+	'Forum' => array( 'Foorumi' ),
+);
+
 /** Russian (Русский) */
 $specialPageAliases['ru'] = array(
 	'Forum' => array( 'Форум', 'Forum' ),
