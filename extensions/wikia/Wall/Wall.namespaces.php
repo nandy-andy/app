@@ -81,4 +81,5 @@ $namespaces['ru'] = array(
 $namespaces['fi'] = array(
 	NS_USER_WALL			=> 'Viestiseinä',
 	NS_USER_WALL_MESSAGE		=> 'Ketju',
+	NS_USER_WALL_MESSAGE_GREETING	=> 'Viestiseinän_tervehdys',
 );

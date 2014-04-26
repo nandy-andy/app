@@ -78,5 +78,7 @@ $namespaces['uk'] = array(
  * Finnish (Suomi)
  */
 $namespaces['fi'] = array(
-	NS_WIKIA_FORUM_BOARD	=> 'Palsta',
+	NS_WIKIA_FORUM_BOARD		=> 'Palsta',
+	NS_WIKIA_FORUM_TOPIC_BOARD	=> 'Aihe',
+	NS_WIKIA_FORUM_BOARD_THREAD	=> 'Palstan_ketju',
 );
