@@ -28,13 +28,12 @@
 		loadStatus: {},
 
 		showMore: function ( e ) {
-			var eid = $( e.target ).attr( 'id' ),
-				msg = eid.split( '-' ),
-				key = msg[4],
-				head = eid.replace( 'more-', '' ),
+			var $target = $( e.target ),
+				head = $target.data( 'ns' )
+				user_id = $target.data( 'userid' ),
+				key = head.split( '-' )[3],
 				cTime = new Date(),
-				valueKey,
-				url;
+				valueKey;
 
 			// this used to compare against undefined and null
 			// so just use non-strict comparison and check for both at the same time
@@ -46,14 +45,20 @@
 				};
 			}
 
-			url = $( e.target ).attr( 'href' ) + '&from=' + follow.loadStatus[key].loaded + '&cb=' + cTime.getTime();
-
 			$.ajax( {
-				url: url,
+				url: mw.util.wikiScript(),
+				data: {
+					action: 'ajax',
+					rs: 'FollowHelper:showAll',
+					head: head,
+					user_id: user_id,
+					from: follow.loadStatus[key].loaded,
+					cb: cTime.getTime()
+				},
 				success: function ( data ) {
 					follow.loadStatus[key].loaded += wgFollowedPagesPagerLimitAjax;
 					if ( follow.loadStatus[key].loaded >= follow.loadStatus[key].toload ) {
-						$( e.target ).hide();
+						$target.hide();
 					}
 
 					$( '#' + head ).append( data );
@@ -85,12 +90,10 @@
 	};
 
 	$( function () {
-		var ids = [
-			'#mw-input-enotiffollowedminoredits',
-			'#mw-input-enotiffollowedpages',
-			'#mw-input-enotifminoredits',
-			'#mw-input-enotifwatchlistpages'
-		].join( ',' );
+		var ids = '#mw-input-enotiffollowedminoredits, ' +
+			'#mw-input-enotiffollowedpages, ' +
+			'#mw-input-enotifminoredits, ' +
+			'#mw-input-enotifwatchlistpages';
 
 		$( '.ajax-unwatch' ).click( follow.uwatch );
 		$( '.ajax-show-more' ).click( follow.showMore ).show();
