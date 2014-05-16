@@ -29,7 +29,7 @@
 
 		showMore: function ( e ) {
 			var $target = $( e.target ),
-				head = $target.data( 'ns' )
+				head = $target.data( 'ns' ),
 				user_id = $target.data( 'userid' ),
 				key = head.split( '-' )[3],
 				cTime = new Date(),
@@ -49,7 +49,7 @@
 				url: mw.util.wikiScript(),
 				data: {
 					action: 'ajax',
-					rs: 'FollowHelper:showAll',
+					rs: 'FollowHelper::showAll',
 					head: head,
 					user_id: user_id,
 					from: follow.loadStatus[key].loaded,
