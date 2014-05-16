@@ -90,9 +90,9 @@
 	};
 
 	$( function () {
-		var ids = '#mw-input-enotiffollowedminoredits, ' +
-			'#mw-input-enotiffollowedpages, ' +
-			'#mw-input-enotifminoredits, ' +
+		var ids = '#mw-input-enotiffollowedminoredits,' +
+			'#mw-input-enotiffollowedpages,' +
+			'#mw-input-enotifminoredits,' +
 			'#mw-input-enotifwatchlistpages';
 
 		$( '.ajax-unwatch' ).click( follow.uwatch );
